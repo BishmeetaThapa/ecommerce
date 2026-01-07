@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 
-export default function ForeverYoungLogin() {
+export default function EverGlowLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-pink-100 to-amber-50 px-4">
       
@@ -22,11 +22,11 @@ export default function ForeverYoungLogin() {
         {/* Brand Header */}
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white font-bold text-xl">
-            FY
+            EG
           </div>
 
           <CardTitle className="text-2xl font-bold tracking-wide">
-            Forever Young
+            EverGlow
           </CardTitle>
 
           <CardDescription className="text-muted-foreground">
@@ -42,7 +42,7 @@ export default function ForeverYoungLogin() {
               <Label>Email</Label>
               <Input
                 type="email"
-                placeholder="you@beauty.com"
+                placeholder="you@everglow.com"
                 className="h-11 rounded-xl"
                 required
               />
@@ -51,7 +51,10 @@ export default function ForeverYoungLogin() {
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label>Password</Label>
-                <Link href='/forgot-password' className="text-sm text-pink-500 hover:underline cursor-pointer">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm text-pink-500 hover:underline"
+                >
                   Forgot?
                 </Link>
               </div>
@@ -86,7 +89,10 @@ export default function ForeverYoungLogin() {
 
           <p className="text-sm text-muted-foreground text-center pt-2">
             New here?{" "}
-            <Link href="/register" className="text-pink-600 font-semibold cursor-pointer hover:underline">
+            <Link
+              href="/register"
+              className="text-pink-600 font-semibold hover:underline"
+            >
               Create an account
             </Link>
           </p>

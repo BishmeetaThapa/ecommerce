@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Link from "next/link"
 
-export default function ForeverYoungRegister() {
+export default function EverGlowRegister() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-pink-100 to-amber-50 px-4">
       
@@ -22,7 +22,7 @@ export default function ForeverYoungRegister() {
         {/* Brand Header */}
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white font-bold text-xl">
-            FY
+            EG
           </div>
 
           <CardTitle className="text-2xl font-bold tracking-wide">
@@ -30,7 +30,7 @@ export default function ForeverYoungRegister() {
           </CardTitle>
 
           <CardDescription className="text-muted-foreground">
-            Join Forever Young & glow every day ✨
+            Join EverGlow & glow every day ✨
           </CardDescription>
         </CardHeader>
 
@@ -54,7 +54,7 @@ export default function ForeverYoungRegister() {
               <Label>Email</Label>
               <Input
                 type="email"
-                placeholder="you@beauty.com"
+                placeholder="you@everglow.com"
                 className="h-11 rounded-xl"
                 required
               />
@@ -105,7 +105,7 @@ export default function ForeverYoungRegister() {
 
           <p className="text-sm text-muted-foreground text-center pt-2">
             Already have an account?{" "}
-            <Link href="/login" className="text-pink-600 font-semibold cursor-pointer hover:underline">
+            <Link href="/login" className="text-pink-600 font-semibold hover:underline">
               Login
             </Link>
           </p>
