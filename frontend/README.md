@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EverGlow Skincare & Makeup - Frontend
 
-## Getting Started
+A modern, responsive **e-commerce frontend** built with **Next.js 13 App Router**, **Tailwind CSS**, **shadcn/ui**, and **Lucide icons**.  
+Products are fetched from the [Makeup API](http://makeup-api.herokuapp.com/api/v1/products.json). This project demonstrates a professional, interview-ready frontend with dynamic routing, modular components, dark mode, and an admin panel structure.
 
-First, run the development server:
+---
 
-```bash
+## 🛠️ Features
+
+### ✅ Completed
+
+- [x] Next.js App Router (`app/` folder)
+- [x] Dynamic product pages (`products/[id]/page.tsx`)
+- [x] Product listing page with responsive grid
+- [x] Product detail page with image, price, description
+- [x] Products fetched from the Makeup API
+- [x] Authentication UI pages (login, register, forgot password) using route groups
+- [x] Admin section (pages are scaffolded and implemented):
+  - [x] `admin/products`
+  - [x] `admin/categories`
+  - [x] `admin/orders`
+  - [x] `admin/customers`
+  - [x] `admin/settings`
+- [x] Dark mode toggle with `DarkModeProvider`
+- [x] Reusable UI components (implemented):
+  - [x] `Card` (`components/Card/Card.tsx`)
+  - [x] `ProductCard` (`components/ProductCard/ProductCard.tsx`)
+  - [x] `Navbar` (`components/Navbar/Navbar.tsx`)
+- [x] UI primitives in `ui/` (examples):
+  - [x] `button.tsx`
+  - [x] `input.tsx`
+- [x] Icons with **Lucide** (cart, favorites, etc.)
+- [x] Responsive UI with Tailwind CSS
+- [x] Styled components using **shadcn/ui**  
+
+### ⏳ Upcoming / Improvements
+- [ ] Cart state management (Context API or Zustand)
+- [ ] Add-to-Cart functionality fully integrated
+- [ ] Admin route protection (fake auth check / redirect)
+- [ ] Category filtering for products
+- [ ] Search functionality for products
+
+### 🔁 Notes
+- The project currently fetches product data from the public Makeup API. No API keys are required for development.
+- Admin routes are present as UI-only pages (no backend/auth guard yet).
+
+---
+
+## 🚀 Getting started
+
+1. Clone the repository and open the `frontend` folder:
+
+```powershell
+cd frontend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Open http://localhost:3000 in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+No additional environment variables are required for the public Makeup API.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 🤝 Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions are welcome — open an issue or a pull request for improvements, bug fixes, or new features.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📄 License
 
-## Deploy on Vercel
+This project is open source. Add a license here (e.g., MIT) if desired.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔗 Tech Stack
+- **Framework:** Next.js 13+ App Router  
+- **Styling:** Tailwind CSS  
+- **UI Components:** shadcn/ui  
+- **Icons:** Lucide React  
+- **Data Source:** [Makeup API](http://makeup-api.herokuapp.com/api/v1/products.json)  
+
+---
+
+## 📂 Folder Structure
+
+app/
+├─ layout.tsx
+├─ page.tsx
+├─ products/
+│ └─ [id]/page.tsx
+├─ authpage/
+│ ├─ login/page.tsx
+│ ├─ register/page.tsx
+│ └─ forgot-password/page.tsx
+components/
+├─ Card/
+│ └─ Card.tsx
+├─ ProductCard/
+│ └─ ProductCard.tsx
+├─ Navbar/
+│ └─ Navbar.tsx
+├─ DarkModeProvider/
+│ └─ DarkModeProvider.tsx
+ui/
+├─ button.tsx
+├─ input.tsx
+
+
+---
+

@@ -1,9 +1,17 @@
+
+import { DarkModeProvider } from '@/components/DarkModeProvider/page'
+import Navbar from '@/components/Navbar/page'
+import ProductCard from '@/components/productcard/page'
+
 import React from 'react'
 
 const Home = () => {
   return (
     <div>
-      <h1>Welcome to the home page</h1>
+      <DarkModeProvider>
+   <Navbar/>
+   <ProductCard/>
+   </DarkModeProvider>
     </div>
   )
 }
