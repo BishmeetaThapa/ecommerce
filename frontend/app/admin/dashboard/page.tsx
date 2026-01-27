@@ -8,7 +8,9 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
+  
   CardHeader,
+
   CardTitle,
 } from "@/components/ui/card"
 import {
@@ -66,7 +68,9 @@ export default function ChartBarLabelCustom() {
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+  <div className="h-[300px] w-[300px]">
+    <ChartContainer config={chartConfig}>
+
           <BarChart
             accessibilityLayer
             data={chartData}
@@ -113,6 +117,7 @@ export default function ChartBarLabelCustom() {
             </Bar>
           </BarChart>
         </ChartContainer>
+        </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 leading-none font-medium">

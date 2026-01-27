@@ -1,117 +1,87 @@
-'use client'
-
-import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import Link from "next/link"
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
-export default function EverGlowRegister() {
+const invoices = [
+  {
+    invoice: "INV001",
+    paymentStatus: "Paid",
+    totalAmount: "$250.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV002",
+    paymentStatus: "Pending",
+    totalAmount: "$150.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV003",
+    paymentStatus: "Unpaid",
+    totalAmount: "$350.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV004",
+    paymentStatus: "Paid",
+    totalAmount: "$450.00",
+    paymentMethod: "Credit Card",
+  },
+  {
+    invoice: "INV005",
+    paymentStatus: "Paid",
+    totalAmount: "$550.00",
+    paymentMethod: "PayPal",
+  },
+  {
+    invoice: "INV006",
+    paymentStatus: "Pending",
+    totalAmount: "$200.00",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    invoice: "INV007",
+    paymentStatus: "Unpaid",
+    totalAmount: "$300.00",
+    paymentMethod: "Credit Card",
+  },
+]
+
+export function TableDemo() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-100 via-pink-100 to-amber-50 px-4">
-      
-      <Card className="w-full max-w-sm rounded-3xl shadow-2xl border-0">
-        
-        {/* Brand Header */}
-        <CardHeader className="text-center space-y-3">
-          <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 flex items-center justify-center text-white font-bold text-xl">
-            EG
-          </div>
-
-          <CardTitle className="text-2xl font-bold tracking-wide">
-            Create Account
-          </CardTitle>
-
-          <CardDescription className="text-muted-foreground">
-            Join EverGlow & glow every day ✨
-          </CardDescription>
-        </CardHeader>
-
-        {/* Form */}
-        <CardContent>
-          <form className="space-y-5">
-
-            {/* Full Name */}
-            <div className="space-y-2">
-              <Label>Full Name</Label>
-              <Input
-                type="text"
-                placeholder="Your full name"
-                className="h-11 rounded-xl"
-                required
-              />
-            </div>
-
-            {/* Email */}
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input
-                type="email"
-                placeholder="you@everglow.com"
-                className="h-11 rounded-xl"
-                required
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-2">
-              <Label>Password</Label>
-              <Input
-                type="password"
-                placeholder="Create a password"
-                className="h-11 rounded-xl"
-                required
-              />
-            </div>
-
-            {/* Confirm Password */}
-            <div className="space-y-2">
-              <Label>Confirm Password</Label>
-              <Input
-                type="password"
-                placeholder="Confirm your password"
-                className="h-11 rounded-xl"
-                required
-              />
-            </div>
-
-          </form>
-        </CardContent>
-
-        {/* Actions */}
-        <CardFooter className="flex flex-col gap-3">
-          <Button className="w-full h-11 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 hover:opacity-90">
-            Sign Up
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full h-11 rounded-xl flex items-center gap-2"
-          >
-            <img
-              src="https://www.svgrepo.com/show/475656/google-color.svg"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Sign up with Google
-          </Button>
-
-          <p className="text-sm text-muted-foreground text-center pt-2">
-            Already have an account?{" "}
-            <Link href="/login" className="text-pink-600 font-semibold hover:underline">
-              Login
-            </Link>
-          </p>
-        </CardFooter>
-
-      </Card>
-    </div>
+    <Table>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {invoices.map((invoice) => (
+          <TableRow key={invoice.invoice}>
+            <TableCell className="font-medium">{invoice.invoice}</TableCell>
+            <TableCell>{invoice.paymentStatus}</TableCell>
+            <TableCell>{invoice.paymentMethod}</TableCell>
+            <TableCell className="text-right">{invoice.totalAmount}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell colSpan={3}>Total</TableCell>
+          <TableCell className="text-right">$2,500.00</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
   )
 }

@@ -40,6 +40,7 @@ const storeNav: NavItem[] = [
   { title: "Categories", url: "/admin/categories", icon: Tags },
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Customers", url: "/admin/customers", icon: Users },
+  { title: "Users", url: "/admin/users", icon: Users }, // Added Users
 ]
 
 const systemNav: NavItem[] = [
@@ -53,14 +54,14 @@ export function AppSidebar() {
     pathname === url || pathname.startsWith(`${url}/`)
 
   const renderMenu = (items: NavItem[]) =>
-    items.map((item) => {
+    items.map((item) =>{
       const active = isActive(item.url)
 
       return (
         <SidebarMenuItem key={item.title}>
           <SidebarMenuButton asChild>
             <Link
-              href={item.url}
+              href={item.url} 
               className={cn(
                 "group relative flex items-center gap-3 rounded-xl px-5 py-3 text-sm font-medium transition-all",
                 active
