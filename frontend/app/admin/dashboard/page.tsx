@@ -8,7 +8,7 @@ import {
   CardContent,
   CardDescription,
   CardFooter,
-  
+
   CardHeader,
 
   CardTitle,
@@ -24,7 +24,7 @@ import axios from "axios"
 
 export const description = "A bar chart with a custom label"
 
- 
+
 const chartConfig = {
   desktop: {
     label: "Desktop",
@@ -40,27 +40,29 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ChartBarLabelCustom() {
-   const [chartData,setChartData]=useState([])
-  const fetchProduct= async()=>{
-    const {data}=await axios.get(' https://api.escuelajs.co/api/v1/products')
-    const categoryMap={}
-    data.map((item)=>{
-      if(categoryMap[item.category.name]){
-        categoryMap[item.category.name]++
-      }else{
-        categoryMap[item.category.name]=1
+  const [chartData, setChartData] = useState<{ category: string, productQuantity: number }[]>([])
+  const fetchProduct = async () => {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products`)
+    const categoryMap: Record<string, number> = {}
+    data.map((item: any) => {
+      // Our MongoDB uses category as string, old API used item.category.name
+      const cat = item.category?.name || item.category || 'Uncategorized'
+      if (categoryMap[cat]) {
+        categoryMap[cat]++
+      } else {
+        categoryMap[cat] = 1
       }
     })
-    const output = Object.entries(categoryMap).map(item=>{
-       return {category:item[0] ,productQuantity:item[1]}
+    const output = Object.entries(categoryMap).map((item: [string, number]) => {
+      return { category: item[0], productQuantity: item[1] }
     })
 
     setChartData(output)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchProduct()
-  },[])
+  }, [])
   return (
     <Card>
       <CardHeader>
@@ -68,55 +70,55 @@ export default function ChartBarLabelCustom() {
         <CardDescription>January - June 2024</CardDescription>
       </CardHeader>
       <CardContent>
-  <div className="h-[300px] w-[300px]">
-    <ChartContainer config={chartConfig}>
+        <div className="h-[300px] w-[300px]">
+          <ChartContainer config={chartConfig}>
 
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            margin={{
-              right: 16,
-            }}
-          >
-            <CartesianGrid horizontal={false} />
-            <YAxis
-              dataKey="category"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-              hide
-            />
-            <XAxis dataKey="productQuantity" type="number" hide />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Bar
-              dataKey="productQuantity"
+            <BarChart
+              accessibilityLayer
+              data={chartData}
               layout="vertical"
-              fill="var(--color-desktop)"
-              radius={4}
+              margin={{
+                right: 16,
+              }}
             >
-              <LabelList
+              <CartesianGrid horizontal={false} />
+              <YAxis
                 dataKey="category"
-                position="insideLeft"
-                offset={8}
-                className="fill-(--color-label)"
-                fontSize={12}
+                type="category"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => value.slice(0, 3)}
+                hide
               />
-              <LabelList
+              <XAxis dataKey="productQuantity" type="number" hide />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="line" />}
+              />
+              <Bar
                 dataKey="productQuantity"
-                position="right"
-                offset={8}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+                layout="vertical"
+                fill="var(--color-desktop)"
+                radius={4}
+              >
+                <LabelList
+                  dataKey="category"
+                  position="insideLeft"
+                  offset={8}
+                  className="fill-(--color-label)"
+                  fontSize={12}
+                />
+                <LabelList
+                  dataKey="productQuantity"
+                  position="right"
+                  offset={8}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Bar>
+            </BarChart>
+          </ChartContainer>
         </div>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">

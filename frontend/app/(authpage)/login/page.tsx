@@ -7,6 +7,7 @@ import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
 import { useRouter } from "next/navigation"
 import axios from "axios"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -25,9 +26,9 @@ const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
 
 /* Yup Validation Schema */
 const validationSchema = Yup.object({
-  username: Yup.string()
-    .required("Username is required")
-    .matches(usernameRegex, "Username must be 3–20 characters (letters/numbers)"),
+  email: Yup.string()
+    .email("Invalid email")
+    .required("Email is required"),
 
   password: Yup.string()
     .required("Password is required")
@@ -35,7 +36,7 @@ const validationSchema = Yup.object({
 })
 
 /* Password Strength Helper */
-const getPasswordStrength = (password) => {
+const getPasswordStrength = (password: string): string => {
   if (!password) return ""
   if (password.length < 6) return "Weak"
   if (password.length < 10) return "Medium"
@@ -46,25 +47,39 @@ export default function EverGlowLogin() {
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
 
-  const handleLogin = async (values, { setSubmitting }) => {
+  const handleLogin = async (values: { email: string; password: string }, { setSubmitting, setErrors }: { setSubmitting: (val: boolean) => void; setErrors: (errors: Record<string, string>) => void }) => {
     try {
       const response = await axios.post(
-        "https://fakestoreapi.com/auth/login",
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
-          username: values.username,
+          email: values.email,
           password: values.password,
         }
       )
 
-      // FakeStore returns a token on success
+      // Store token and user data
       if (response.data.token) {
-        router.push("/admin")
-      } else {
-        window.alert("Username or password is incorrect")
+        localStorage.setItem("token", response.data.token)
+        localStorage.setItem("user", JSON.stringify(response.data.user))
+
+        // Redirect based on user role
+        const userRole = response.data.user.role
+        if (userRole === 'admin' || userRole === 'ADMIN') {
+          router.push("/admin")
+        } else {
+          router.push("/")
+        }
+        toast.success("Login successful!")
       }
     } catch (error) {
       console.error("Login failed:", error)
-      window.alert("Username or password is incorrect")
+      const err = error as { response?: { data?: { error?: string } } }
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error)
+        setErrors({ email: " ", password: err.response.data.error })
+      } else {
+        toast.error("Login failed. Please try again.")
+      }
     } finally {
       setSubmitting(false)
     }
@@ -72,7 +87,7 @@ export default function EverGlowLogin() {
 
   const formik = useFormik({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validationSchema,
@@ -94,18 +109,19 @@ export default function EverGlowLogin() {
         <CardContent>
           <form onSubmit={formik.handleSubmit} className="space-y-5">
 
-            {/* Username */}
+            {/* Email */}
             <div className="space-y-2">
-              <Label>Username</Label>
+              <Label>Email</Label>
               <Input
-                name="username"
-                placeholder="johnd"
-                value={formik.values.username}
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                value={formik.values.email}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
-              {formik.touched.username && formik.errors.username && (
-                <p className="text-xs text-red-500">{formik.errors.username}</p>
+              {formik.touched.email && formik.errors.email && (
+                <p className="text-xs text-red-500">{formik.errors.email}</p>
               )}
             </div>
 
@@ -129,6 +145,14 @@ export default function EverGlowLogin() {
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
+              </div>
+              <div className="text-right">
+                <Link
+                  href="/login/forgot-password"
+                  className="text-xs text-pink-600 hover:underline"
+                >
+                  Forgot password?
+                </Link>
               </div>
 
               {formik.values.password && (

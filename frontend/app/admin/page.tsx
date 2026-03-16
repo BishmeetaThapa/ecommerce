@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ShoppingCart, Package, Users, Tags, TrendingUp, Sparkles } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api`
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({
@@ -43,8 +43,8 @@ export default function AdminOverview() {
 
         setRecentOrders(ordersRes.data.slice(0, 5))
 
-        // Sort users by order count for top customers
-        const sortedUsers = [...usersRes.data].sort((a, b) => (b._count?.orders || 0) - (a._count?.orders || 0))
+        // Sort users by order count for top customers (MongoDB format)
+        const sortedUsers = [...usersRes.data].sort((a, b) => (b.orders?.length || 0) - (a.orders?.length || 0))
         setTopCustomers(sortedUsers.slice(0, 5))
 
       } catch (err) {

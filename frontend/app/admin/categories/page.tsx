@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Edit, Trash2, Plus, RefreshCcw } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api/products/categories"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/categories`
 
 /* ================= DELETE DIALOG ================= */
 function DeleteDialog({ category, onDelete }: { category: any, onDelete: (id: string) => void }) {
@@ -21,9 +21,11 @@ function DeleteDialog({ category, onDelete }: { category: any, onDelete: (id: st
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}/${category.id}`)
+      // MongoDB uses _id, old API uses id
+      const categoryId = category._id || category.id;
+      await axios.delete(`${API_BASE}/${categoryId}`)
       toast.success("Category deleted from Everglow catalog")
-      onDelete(category.id)
+      onDelete(categoryId)
       setOpen(false)
     } catch (err) {
       console.error(err)

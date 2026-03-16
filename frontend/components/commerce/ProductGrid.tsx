@@ -15,7 +15,7 @@ const ProductGrid = () => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    'http://localhost:5000/api/products'
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/products`
                 )
                 // Normalize data from our backend
                 const normalizedData = response.data.map((item: any) => ({

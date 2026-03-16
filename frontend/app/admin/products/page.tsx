@@ -91,15 +91,18 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
     const fetchMetadata = async () => {
       try {
         const [cats, brs] = await Promise.all([
-          axios.get("http://localhost:5000/api/products/categories"),
-          axios.get("http://localhost:5000/api/products/brands")
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/categories`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/brands`)
         ])
         setCategories(cats.data)
         setBrands(brs.data)
 
         // If new product and we have metadata, pre-select first ones
         if (!item && cats.data.length > 0 && brs.data.length > 0) {
-          setForm(f => ({ ...f, categoryId: cats.data[0].id, brandId: brs.data[0].id }))
+          // MongoDB uses _id, old API uses id
+          const firstCat = cats.data[0];
+          const firstBrand = brs.data[0];
+          setForm(f => ({ ...f, categoryId: firstCat._id || firstCat.id, brandId: firstBrand._id || firstBrand.id }))
         }
       } catch (err) {
         console.error("Metadata fetch failed", err)

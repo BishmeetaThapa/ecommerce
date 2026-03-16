@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import Link from "next/link"
-import { Mail, CheckCircle } from "lucide-react"
+import { Mail, CheckCircle, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -19,7 +19,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 /* ------------------------------------------------ */
-/* 🚫 Disposable Email Domains */
+/* 🚀 API Base URL */
+/* ------------------------------------------------ */
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000') + '/api';
+
+/* ------------------------------------------------ */
+/*  Disposable Email Domains */
 /* ------------------------------------------------ */
 const blockedDomains = [
   "mailinator.com",
@@ -32,7 +37,7 @@ const blockedDomains = [
 /* 📧 Advanced Dot-Safe Email Regex */
 /* ------------------------------------------------ */
 const advancedEmailRegex =
-/^(?!\.)(?!.*\.\.)([a-zA-Z0-9_'+\-\.]+)(?<!\.)@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
+  /^(?!\.)(?!.*\.\.)([a-zA-Z0-9_'+\-\.]+)(?<!\.)@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
 
 /* ------------------------------------------------ */
 /* ✅ Yup Validation Schema */
@@ -58,6 +63,8 @@ const validationSchema = Yup.object({
 /* ------------------------------------------------ */
 export default function EverGlowForgotPassword() {
   const [sent, setSent] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const formik = useFormik({
     initialValues: {
@@ -66,10 +73,33 @@ export default function EverGlowForgotPassword() {
     validationSchema,
     validateOnChange: true,
     validateOnBlur: true,
-    onSubmit: async (values) => {
-      console.log("Reset email sent to:", values.email)
-      // 🔐 Call forgot-password API here
-      setSent(true)
+    onSubmit: async (values, { setSubmitting }) => {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch(`${API_URL}/auth/forgot-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: values.email }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to send reset link')
+        }
+
+        // Show success message
+        setSent(true)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred. Please try again.')
+      } finally {
+        setIsLoading(false)
+        setSubmitting(false)
+      }
     },
   })
 
@@ -88,7 +118,7 @@ export default function EverGlowForgotPassword() {
           </CardTitle>
 
           <CardDescription>
-            No worries ✨ Enter your email and we’ll send you a reset link
+            No worries ✨ Enter your email and we'll send you a reset link
           </CardDescription>
         </CardHeader>
 
@@ -110,11 +140,10 @@ export default function EverGlowForgotPassword() {
                     value={formik.values.email}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    className={`h-11 rounded-xl pl-10 ${
-                      formik.touched.email && formik.errors.email
-                        ? "border-red-500 focus-visible:ring-red-500"
-                        : ""
-                    }`}
+                    className={`h-11 rounded-xl pl-10 ${formik.touched.email && formik.errors.email
+                      ? "border-red-500 focus-visible:ring-red-500"
+                      : ""
+                      }`}
                   />
                 </div>
 
@@ -128,11 +157,25 @@ export default function EverGlowForgotPassword() {
               {/* Submit */}
               <Button
                 type="submit"
-                disabled={!formik.isValid || formik.isSubmitting}
+                disabled={!formik.isValid || formik.isSubmitting || isLoading}
                 className="w-full h-11 rounded-xl bg-gradient-to-r from-pink-500 to-rose-500 disabled:opacity-50"
               >
-                Send Reset Link
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Reset Link"
+                )}
               </Button>
+
+              {/* Error Message */}
+              {error && (
+                <p className="text-xs text-red-500 text-center">
+                  {error}
+                </p>
+              )}
 
             </form>
           ) : (
@@ -146,7 +189,7 @@ export default function EverGlowForgotPassword() {
                   {formik.values.email}
                 </span>
                 <br />
-                you’ll receive a password reset link shortly.
+                you'll receive a password reset link shortly.
               </p>
             </div>
           )}

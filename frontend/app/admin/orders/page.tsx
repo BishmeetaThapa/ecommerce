@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { RefreshCcw, Eye, Package, User, MapPin, Calendar, CreditCard } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api/orders"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/orders`
 
 /* ================= ORDER DETAILS ================= */
 

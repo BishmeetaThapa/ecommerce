@@ -12,11 +12,20 @@ import { Edit, Trash2, Plus } from "lucide-react"
 /* ================= DELETE DIALOG ================= */
 function DeleteDialog({ customer, onDelete }: any) {
   const [open, setOpen] = useState(false)
+  const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
 
-  const handleDelete = () => {
-    toast.success("Customer deleted (mock)")
-    onDelete(customer.id)
-    setOpen(false)
+  const handleDelete = async () => {
+    try {
+      // MongoDB uses _id, old API uses id
+      const customerId = customer._id || customer.id;
+      await axios.delete(`${API_BASE}/${customerId}`)
+      toast.success("Customer deleted")
+      onDelete(customerId)
+      setOpen(false)
+    } catch (err) {
+      console.error(err)
+      toast.error("Delete failed")
+    }
   }
 
   return (
@@ -113,18 +122,23 @@ function CustomerDialog({ customer, onSave }: any) {
 const CustomersPage = () => {
   const [customers, setCustomers] = useState<any[]>([])
   const [search, setSearch] = useState("")
+  const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
 
   const fetchCustomers = async () => {
     try {
-      const res = await axios.get("https://fakestoreapi.com/users") // fake API
-      const data = res.data.map((u: any, i: number) => ({
-        id: u.id,
-        name: `${u.name.firstname} ${u.name.lastname}`,
-        email: u.email,
-        phone: u.phone || `+977-98123456${i}`,
-        joined: new Date().toISOString().split("T")[0],
-        status: i % 3 === 0 ? "Inactive" : "Active"
-      }))
+      const res = await axios.get(API_BASE)
+      // Filter for customers only and map to display format
+      const data = res.data
+        .filter((u: any) => u.role === 'customer')
+        .map((u: any) => ({
+          _id: u._id,
+          id: u._id,
+          name: u.name,
+          email: u.email,
+          phone: u.phone || '',
+          joined: u.createdAt ? new Date(u.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          status: 'Active'
+        }))
       setCustomers(data)
     } catch {
       toast.error("Failed to fetch customers")
@@ -140,12 +154,24 @@ const CustomersPage = () => {
     c.email.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleSaveUI = (cust: any, type: string) => {
-    if (type === "add") setCustomers((prev) => [cust, ...prev])
-    else setCustomers((prev) => prev.map((c) => (c.id === cust.id ? cust : c)))
+  const handleSaveUI = async (cust: any, type: string) => {
+    try {
+      const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+      if (type === "add") {
+        // For adding, we need to register through auth
+        toast.success("Please use registration page to add customers")
+      } else {
+        await axios.put(`${API_BASE}/${cust._id || cust.id}`, { role: cust.status === 'Active' ? 'customer' : 'inactive' })
+        toast.success("Customer updated")
+        fetchCustomers()
+      }
+    } catch (err) {
+      console.error(err)
+      toast.error("Update failed")
+    }
   }
 
-  const handleDeleteUI = (id: number) => setCustomers((prev) => prev.filter((c) => c.id !== id))
+  const handleDeleteUI = (id: string) => setCustomers((prev) => prev.filter((c) => (c._id || c.id) !== id))
 
   return (
     <div className="max-w-7xl mx-auto p-8 bg-white min-h-screen">

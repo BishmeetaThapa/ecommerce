@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Edit, Trash2, RefreshCcw, UserCircle2, Mail, ShieldCheck, Clock } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api/users"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
 
 /* ================= DELETE USER ================= */
 
@@ -27,9 +27,11 @@ function DeleteDialog({ user, onDelete }: { user: any, onDelete: (id: string) =>
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}/${user.id}`)
+      // MongoDB uses _id, old API uses id
+      const userId = user._id || user.id;
+      await axios.delete(`${API_BASE}/${userId}`)
       toast.success("User account suspended & removed")
-      onDelete(user.id)
+      onDelete(userId)
       setOpen(false)
     } catch {
       toast.error("Action restricted")

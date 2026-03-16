@@ -1,11 +1,9 @@
 'use client'
 
-import { decrement, increment } from '@/redux/slice/counter/counterslice'
-import { useSelector, useDispatch } from 'react-redux'
+import { useCounterStore } from '@/lib/store/useCounterStore'
 
 function Counter() {
-  const count = useSelector((state: any) => state.counter.value)
-  const dispatch = useDispatch()
+  const { count, increment, decrement } = useCounterStore()
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-100">
@@ -21,7 +19,7 @@ function Counter() {
 
         <div className="flex gap-4">
           <button
-            onClick={() => dispatch(decrement())}
+            onClick={decrement}
             className="flex-1 rounded-lg border border-zinc-300 px-4 py-3
                        text-zinc-700 font-medium
                        hover:bg-red-50 hover:border-red-300
@@ -33,7 +31,7 @@ function Counter() {
           </button>
 
           <button
-            onClick={() => dispatch(increment())}
+            onClick={increment}
             className="flex-1 rounded-lg border border-zinc-300 px-4 py-3
                        text-zinc-700 font-medium
                        hover:bg-emerald-50 hover:border-emerald-300
@@ -46,7 +44,7 @@ function Counter() {
         </div>
 
         <p className="mt-6 text-center text-sm text-zinc-500">
-          Redux Toolkit Counter
+          Zustand Counter
         </p>
       </div>
     </div>

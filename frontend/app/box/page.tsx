@@ -1,18 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { decrementHeight, incrementHeight } from '@/redux/slice/box/boxslice';
-import type { RootState } from '@/redux/store';
+import { useBoxStore } from '@/lib/store/useBoxStore';
 
 const Box: React.FC = () => {
-  const dispatch = useDispatch(); // ✅ Make sure to call it
-  const { height, width } = useSelector((state: RootState) => state.box);
+  const { height, width, incrementHeight, decrementHeight } = useBoxStore();
 
   const [step, setStep] = useState(10);
 
-  const handleIncrement = () => dispatch(incrementHeight(step)); // Increase
-  const handleDecrement = () => dispatch(decrementHeight(-step)); // Decrease
+  const handleIncrement = () => incrementHeight(step); // Increase
+  const handleDecrement = () => decrementHeight(-step); // Decrease
 
   return (
     <div className="flex flex-col items-center gap-4 p-6">
