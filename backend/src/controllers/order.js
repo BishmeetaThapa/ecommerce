@@ -1,5 +1,6 @@
 const Order = require('../models/order');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 // Get all orders
 const getAllOrders = async (req, res) => {
@@ -7,7 +8,16 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate('user', 'name email')
             .sort({ createdAt: -1 });
-        res.json(orders);
+
+        // Map products to items for frontend compatibility
+        const mappedOrders = orders.map(order => ({
+            ...order.toObject(),
+            items: order.products,
+            id: order._id,
+            status: order.status?.toUpperCase() || 'PENDING'
+        }));
+
+        res.json(mappedOrders);
     } catch (error) {
         console.error('Get orders error:', error);
         res.status(500).json({ error: 'Error fetching orders' });
@@ -24,7 +34,14 @@ const getOrderById = async (req, res) => {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        res.json(order);
+        // Map products to items for frontend compatibility
+        const mappedOrder = {
+            ...order.toObject(),
+            items: order.products,
+            id: order._id
+        };
+
+        res.json(mappedOrder);
     } catch (error) {
         console.error('Get order error:', error);
         res.status(500).json({ error: 'Error fetching order' });
@@ -34,18 +51,35 @@ const getOrderById = async (req, res) => {
 // Create new order
 const createOrder = async (req, res) => {
     try {
-        const { user, products, totalAmount, shippingAddress, paymentMethod } = req.body;
+        const { user, items, totalAmount, shippingAddress, paymentMethod, status } = req.body;
+
+        // Accept both 'items' and 'products' for compatibility
+        const products = items || req.body.products;
+
+        // Convert user string to ObjectId if it's valid
+        let userId = null;
+        if (user && mongoose.Types.ObjectId.isValid(user)) {
+            userId = new mongoose.Types.ObjectId(user);
+        }
 
         const order = new Order({
-            user,
+            user: userId,
             products,
-            totalAmount,
+            totalAmount: Number(totalAmount) || 0,
             shippingAddress,
-            paymentMethod: paymentMethod || 'cash on delivery'
+            paymentMethod: paymentMethod || 'cash on delivery',
+            status: (status || 'pending').toLowerCase()
         });
 
         await order.save();
-        res.status(201).json(order);
+
+        // Return with mapped items field
+        res.status(201).json({
+            ...order.toObject(),
+            items: order.products,
+            id: order._id,
+            status: order.status?.toUpperCase() || 'PENDING'
+        });
     } catch (error) {
         console.error('Create order error:', error);
         res.status(500).json({ error: 'Error creating order' });
@@ -63,7 +97,7 @@ const updateOrder = async (req, res) => {
             return res.status(404).json({ error: 'Order not found' });
         }
 
-        if (status) order.status = status;
+        if (status) order.status = status.toLowerCase();
         if (isPaid !== undefined) {
             order.isPaid = isPaid;
             if (isPaid) order.paidAt = Date.now();
@@ -71,7 +105,14 @@ const updateOrder = async (req, res) => {
         order.updatedAt = Date.now();
 
         await order.save();
-        res.json(order);
+
+        // Return with mapped items field
+        res.json({
+            ...order.toObject(),
+            items: order.products,
+            id: order._id,
+            status: order.status?.toUpperCase() || 'PENDING'
+        });
     } catch (error) {
         console.error('Update order error:', error);
         res.status(500).json({ error: 'Error updating order' });
