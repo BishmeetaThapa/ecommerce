@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: false
     },
     products: [{
         product: {
@@ -28,7 +28,6 @@ const orderSchema = new mongoose.Schema({
     shippingAddress: {
         street: String,
         city: String,
-        state: String,
         zipCode: String,
         country: String
     },
@@ -51,12 +50,6 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
-
-// Update timestamp on save
-orderSchema.pre('save', function (next) {
-    this.updatedAt = Date.now();
-    next();
 });
 
 module.exports = mongoose.model('Order', orderSchema);
