@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Edit, Trash2, Plus, RefreshCcw, ExternalLink } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api/products"
+const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/products`
 
 /* ================= DELETE ================= */
 
@@ -26,9 +26,13 @@ function DeleteDialog({ item, onDelete }: { item: any, onDelete: (id: string) =>
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_BASE}/${item.id}`)
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const productId = item._id || item.id
+
+      await axios.delete(`${API_BASE}/${productId}`, { headers })
       toast.success("Product deleted from Everglow")
-      onDelete(item.id)
+      onDelete(productId)
       setOpen(false)
     } catch (err) {
       console.error(err)
@@ -73,6 +77,7 @@ function DeleteDialog({ item, onDelete }: { item: any, onDelete: (id: string) =>
 function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) => void, onSave: (p: any, t: string) => void }) {
   const [categories, setCategories] = useState<any[]>([])
   const [brands, setBrands] = useState<any[]>([])
+  const [initialized, setInitialized] = useState(false)
 
   const [form, setForm] = useState(
     item ? {
@@ -82,34 +87,49 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
       description: item.description,
       stock: item.stock || 0,
       image: item.images?.[0]?.url || "",
-      brandId: item.brandId,
-      categoryId: item.categoryId
-    } : { name: "", slug: "", price: "", description: "", stock: 10, image: "", brandId: "", categoryId: "" }
+      brand: item.brand || "",
+      category: item.category || ""
+    } : { name: "", slug: "", price: "", description: "", stock: 10, image: "", brand: "", category: "" }
   )
 
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
         const [cats, brs] = await Promise.all([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/categories`),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/products/brands`)
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`),
+          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/brands`)
         ])
         setCategories(cats.data)
         setBrands(brs.data)
 
-        // If new product and we have metadata, pre-select first ones
-        if (!item && cats.data.length > 0 && brs.data.length > 0) {
-          // MongoDB uses _id, old API uses id
-          const firstCat = cats.data[0];
-          const firstBrand = brs.data[0];
-          setForm(f => ({ ...f, categoryId: firstCat._id || firstCat.id, brandId: firstBrand._id || firstBrand.id }))
+        // If we have categories and brands loaded and form not yet initialized
+        if (!initialized) {
+          setInitialized(true)
+
+          if (!item && cats.data.length > 0 && brs.data.length > 0) {
+            // For new products, pre-select first ones
+            const firstCat = cats.data[0];
+            const firstBrand = brs.data[0];
+            setForm(f => ({ ...f, category: firstCat._id, brand: firstBrand._id }))
+          } else if (item) {
+            // For existing products, try to find matching category and brand
+            // The product stores names as strings, we need to match by name
+            const matchingCat = cats.data.find((c: any) => c.name === item.category)
+            const matchingBrand = brs.data.find((b: any) => b.name === item.brand)
+
+            setForm(f => ({
+              ...f,
+              category: matchingCat?._id || item.category || "",
+              brand: matchingBrand?._id || item.brand || ""
+            }))
+          }
         }
       } catch (err) {
         console.error("Metadata fetch failed", err)
       }
     }
     fetchMetadata()
-  }, [item])
+  }, [item, initialized])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm({ ...form, [e.target.id]: e.target.value })
@@ -117,24 +137,36 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
       const payload = {
-        ...form,
+        name: form.name,
+        slug: form.slug,
+        price: form.price,
+        description: form.description,
+        stock: form.stock,
+        brand: form.brand,
+        category: form.category,
         images: [form.image]
       }
 
+      console.log("Submitting payload:", payload)
+      console.log("Product ID:", item?._id || item?.id)
+
       if (item) {
-        const res = await axios.put(`${API_BASE}/${item.id}`, payload)
+        const res = await axios.put(`${API_BASE}/${item._id || item.id}`, payload, { headers })
         onSave(res.data, "edit")
         toast.success("Product updated successfully")
       } else {
-        const res = await axios.post(API_BASE, payload)
+        const res = await axios.post(API_BASE, payload, { headers })
         onSave(res.data, "add")
         toast.success("New product added to catalog")
       }
       close(false)
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      toast.error("Action failed - check console")
+      toast.error(err.response?.data?.error || "Action failed - check console")
     }
   }
 
@@ -153,27 +185,29 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
 
       <div className="grid grid-cols-2 gap-4">
         <div className="grid gap-1">
-          <Label htmlFor="brandId">Brand</Label>
+          <Label htmlFor="brand">Brand</Label>
           <select
-            id="brandId"
-            value={form.brandId}
+            id="brand"
+            value={form.brand}
             onChange={handleChange}
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             required
           >
-            {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+            <option value="">Select a brand</option>
+            {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
           </select>
         </div>
         <div className="grid gap-1">
-          <Label htmlFor="categoryId">Category</Label>
+          <Label htmlFor="category">Category</Label>
           <select
-            id="categoryId"
-            value={form.categoryId}
+            id="category"
+            value={form.category}
             onChange={handleChange}
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             required
           >
-            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            <option value="">Select a category</option>
+            {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
           </select>
         </div>
       </div>
@@ -293,13 +327,14 @@ export default function AdminProductsPage() {
 
   /* ===== CRUD UI UPDATE ===== */
   const handleDeleteUI = (id: string) =>
-    setProducts((prev) => prev.filter((p) => p.id !== id))
+    setProducts((prev) => prev.filter((p) => (p._id || p.id) !== id))
 
   const handleSaveUI = (product: any, type: string) => {
+    const prodId = product._id || product.id
     if (type === "add") setProducts((p) => [product, ...p])
     else
       setProducts((p) =>
-        p.map((i) => (i.id === product.id ? product : i))
+        p.map((i) => ((i._id || i.id) === prodId ? product : i))
       )
   }
 
@@ -356,7 +391,7 @@ export default function AdminProductsPage() {
               ))
             ) : paginated.length ? (
               paginated.map((p) => (
-                <TableRow key={p.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
+                <TableRow key={p._id || p.id} className="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0">
                   <TableCell className="py-4 px-6">
                     <div className="flex gap-4 items-center">
                       <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
@@ -392,7 +427,7 @@ export default function AdminProductsPage() {
 
                   <TableCell>
                     <span className="px-3 py-1 bg-pink-50 text-pink-600 text-xs font-bold rounded-full border border-pink-100 uppercase tracking-tighter">
-                      {p.brand?.name || "N/A"}
+                      {p.brand || "N/A"}
                     </span>
                   </TableCell>
 
