@@ -9,6 +9,18 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Edit, Trash2, Plus } from "lucide-react"
 
+// Generate a secure random password for new customers
+const generateSecurePassword = (): string => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
+  let password = ""
+  const array = new Uint32Array(12)
+  crypto.getRandomValues(array)
+  for (let i = 0; i < 12; i++) {
+    password += chars[array[i] % chars.length]
+  }
+  return password
+}
+
 /* ================= DELETE DIALOG ================= */
 function DeleteDialog({ customer, onDelete }: any) {
   const [open, setOpen] = useState(false)
@@ -76,9 +88,9 @@ function CustomerForm({ customer, close, onSave, refreshCustomers }: any) {
         await axios.post(`${API_BASE}/register`, {
           name: form.name,
           email: form.email,
-          password: 'customer123' // Default password for new customers
+          password: generateSecurePassword()
         })
-        toast.success("Customer added successfully!")
+        toast.success("Customer added successfully! Temporary password generated.")
         refreshCustomers()
       } catch (err: any) {
         console.error('Error adding customer:', err)
