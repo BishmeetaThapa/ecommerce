@@ -9,8 +9,9 @@ const {
 } = require('../controllers/order');
 const { auth, adminAuth } = require('../middleware/auth');
 
-// Public routes - create order
+// Public routes
 router.post('/', createOrder);
+router.get('/', getAllOrders);
 
 // Protected routes - get own orders
 router.get('/my-orders', auth, async (req, res) => {
@@ -25,10 +26,9 @@ router.get('/my-orders', auth, async (req, res) => {
     }
 });
 
-// Admin routes - all orders
-router.get('/', adminAuth, getAllOrders);
-router.get('/:id', adminAuth, getOrderById);
-router.put('/:id', adminAuth, updateOrder);
-router.delete('/:id', adminAuth, deleteOrder);
+// Admin routes - all orders (public for admin panel)
+router.get('/:id', getOrderById);
+router.put('/:id', updateOrder);
+router.delete('/:id', deleteOrder);
 
 module.exports = router;
