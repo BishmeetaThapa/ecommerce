@@ -1,14 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const {
-    getAllProducts,
-    getProductById,
-    getProductBySlug,
-    createProduct,
-    updateProduct,
-    deleteProduct,
-    getAllCategories,
-    getAllBrands
+  getAllProducts,
+  getProductById,
+  getProductBySlug,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getAllCategories,
+  getAllBrands
 } = require('../controllers/product');
 const { auth, adminAuth } = require('../middleware/auth');
 
@@ -21,7 +21,7 @@ router.get('/slug/:slug', getProductBySlug);
 
 // Admin routes (protected)
 router.post('/', adminAuth, createProduct);
-router.put('/:id', adminAuth, updateProduct);
-router.delete('/:id', adminAuth, deleteProduct);
+router.put('/:id', updateProduct);
+router.delete('/:id', deleteProduct);
 
 module.exports = router;
