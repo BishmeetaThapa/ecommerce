@@ -33,7 +33,7 @@ const ProductViewPage = () => {
         const normalized = {
           ...item,
           image_link: item.images?.[0]?.url || 'https://via.placeholder.com/400',
-          brand: item.brand?.name || 'EverGlow'
+          brand: item.brand || 'EverGlow'
         }
         setProduct(normalized)
       } catch (err) {
