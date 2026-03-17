@@ -43,8 +43,24 @@ export default function AdminOverview() {
 
         setRecentOrders(ordersRes.data.slice(0, 5))
 
-        // Sort users by order count for top customers (MongoDB format)
-        const sortedUsers = [...usersRes.data].sort((a, b) => (b.orders?.length || 0) - (a.orders?.length || 0))
+        // Calculate top customers by counting orders per user
+        const userOrderCounts: Record<string, number> = {}
+        ordersRes.data.forEach((order: any) => {
+          // Get userId from populated user object or direct user field
+          const userId = order.user?._id || order.userId || order.user
+          if (userId) {
+            userOrderCounts[userId] = (userOrderCounts[userId] || 0) + 1
+          }
+        })
+
+        // Map users with their order counts
+        const usersWithCounts = usersRes.data.map((user: any) => ({
+          ...user,
+          orderCount: userOrderCounts[user._id] || 0
+        }))
+
+        // Sort by order count descending
+        const sortedUsers = usersWithCounts.sort((a, b) => b.orderCount - a.orderCount)
         setTopCustomers(sortedUsers.slice(0, 5))
 
       } catch (err) {
@@ -104,7 +120,7 @@ export default function AdminOverview() {
             <div className="space-y-6">
               {loading ? [...Array(4)].map((_, i) => <div key={i} className="h-12 bg-gray-50 animate-pulse rounded-2xl" />) :
                 recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-[1.5rem] hover:bg-gray-100 transition-colors">
+                  <div key={order._id || order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-[1.5rem] hover:bg-gray-100 transition-colors">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center font-black text-xs text-gray-400 border border-gray-100">
                         #{order.id.slice(0, 4)}
@@ -135,7 +151,7 @@ export default function AdminOverview() {
             <div className="space-y-6">
               {loading ? [...Array(4)].map((_, i) => <div key={i} className="h-12 bg-gray-50 animate-pulse rounded-2xl" />) :
                 topCustomers.map((user) => (
-                  <div key={user.id} className="flex items-center justify-between group">
+                  <div key={user._id || user.id} className="flex items-center justify-between group">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center font-black">
                         {user.name?.charAt(0) || user.email.charAt(0)}
@@ -146,7 +162,7 @@ export default function AdminOverview() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-black text-gray-900 text-sm">{user._count?.orders || 0}</p>
+                      <p className="font-black text-gray-900 text-sm">{user.orderCount || 0}</p>
                       <p className="text-[10px] text-gray-400 font-bold uppercase">Orders</p>
                     </div>
                   </div>
