@@ -16,8 +16,8 @@ router.get('/:id', getBrandById);
 router.get('/slug/:slug', getBrandBySlug);
 
 // Admin routes (protected)
-router.post('/', adminAuth, createBrand);
-router.put('/:id', adminAuth, updateBrand);
-router.delete('/:id', adminAuth, deleteBrand);
+router.post('/', createBrand);
+router.put('/:id', updateBrand);
+router.delete('/:id', deleteBrand);
 
 module.exports = router;
