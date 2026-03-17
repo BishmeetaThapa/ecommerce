@@ -51,7 +51,7 @@ function DeleteDialog({ customer, onDelete }: any) {
 }
 
 /* ================= CUSTOMER FORM ================= */
-function CustomerForm({ customer, close, onSave }: any) {
+function CustomerForm({ customer, close, onSave, refreshCustomers }: any) {
   const [form, setForm] = useState({
     name: customer?.name || "",
     email: customer?.email || "",
@@ -63,14 +63,27 @@ function CustomerForm({ customer, close, onSave }: any) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm({ ...form, [e.target.id]: e.target.value })
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+
     if (customer) {
       onSave({ ...customer, ...form }, "edit")
-      toast.success("Customer updated (mock)")
+      toast.success("Customer updated")
     } else {
-      onSave({ id: Date.now(), ...form }, "add")
-      toast.success("Customer added (mock)")
+      try {
+        // Call the registration API to create a new customer
+        await axios.post(`${API_BASE}/register`, {
+          name: form.name,
+          email: form.email,
+          password: 'customer123' // Default password for new customers
+        })
+        toast.success("Customer added successfully!")
+        refreshCustomers()
+      } catch (err: any) {
+        console.error('Error adding customer:', err)
+        toast.error(err.response?.data?.error || "Failed to add customer")
+      }
     }
     close(false)
   }
@@ -91,7 +104,7 @@ function CustomerForm({ customer, close, onSave }: any) {
 }
 
 /* ================= ADD / EDIT DIALOG ================= */
-function CustomerDialog({ customer, onSave }: any) {
+function CustomerDialog({ customer, onSave, refreshCustomers }: any) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -112,7 +125,7 @@ function CustomerDialog({ customer, onSave }: any) {
         <DialogHeader>
           <DialogTitle>{customer ? "Edit Customer" : "Add Customer"}</DialogTitle>
         </DialogHeader>
-        <CustomerForm customer={customer} close={setOpen} onSave={onSave} />
+        <CustomerForm customer={customer} close={setOpen} onSave={onSave} refreshCustomers={refreshCustomers} />
       </DialogContent>
     </Dialog>
   )
@@ -157,13 +170,29 @@ const CustomersPage = () => {
   const handleSaveUI = async (cust: any, type: string) => {
     try {
       const API_BASE = `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+      const custId = cust._id || cust.id
+
+      if (!custId) {
+        console.error('Customer ID not found:', cust)
+        toast.error("Cannot update: Customer ID not found")
+        return
+      }
+
       if (type === "add") {
-        // For adding, we need to register through auth
-        toast.success("Please use registration page to add customers")
+        // Already handled in CustomerForm
+        return
       } else {
-        await axios.put(`${API_BASE}/${cust._id || cust.id}`, { role: cust.status === 'Active' ? 'customer' : 'inactive' })
-        toast.success("Customer updated")
-        fetchCustomers()
+        // For edit, update the customer details
+        await axios.put(`${API_BASE}/${custId}`, {
+          role: 'customer',
+          name: cust.name,
+          email: cust.email
+        })
+        toast.success("Customer updated!")
+        // Update local state
+        setCustomers(prev => prev.map(c =>
+          (c._id || c.id) === custId ? { ...c, ...cust } : c
+        ))
       }
     } catch (err) {
       console.error(err)
@@ -171,7 +200,13 @@ const CustomersPage = () => {
     }
   }
 
-  const handleDeleteUI = (id: string) => setCustomers((prev) => prev.filter((c) => (c._id || c.id) !== id))
+  const handleDeleteUI = (id: string) => {
+    if (!id) {
+      toast.error("Cannot delete: ID not found")
+      return
+    }
+    setCustomers((prev) => prev.filter((c) => (c._id || c.id) !== id))
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-8 bg-white min-h-screen">
@@ -181,7 +216,7 @@ const CustomersPage = () => {
           <h1 className="text-2xl font-bold text-pink-600">Everglow Customers</h1>
           <p className="text-gray-500 text-sm">Manage your registered customers</p>
         </div>
-        <CustomerDialog onSave={handleSaveUI} />
+        <CustomerDialog onSave={handleSaveUI} refreshCustomers={fetchCustomers} />
       </div>
 
       {/* SEARCH */}
@@ -210,7 +245,7 @@ const CustomersPage = () => {
 
           <TableBody>
             {filtered.map((c) => (
-              <TableRow key={c.id} className="hover:bg-gray-50">
+              <TableRow key={c._id || c.id} className="hover:bg-gray-50">
                 <TableCell>{c.name}</TableCell>
                 <TableCell>{c.email}</TableCell>
                 <TableCell>{c.phone}</TableCell>
@@ -221,7 +256,7 @@ const CustomersPage = () => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right flex justify-end gap-2">
-                  <CustomerDialog customer={c} onSave={handleSaveUI} />
+                  <CustomerDialog customer={c} onSave={handleSaveUI} refreshCustomers={fetchCustomers} />
                   <DeleteDialog customer={c} onDelete={handleDeleteUI} />
                 </TableCell>
               </TableRow>
