@@ -1,10 +1,29 @@
 const Brand = require('../models/brand');
+const Product = require('../models/product');
 
 // Get all brands
 const getAllBrands = async (req, res) => {
     try {
         const brands = await Brand.find({ isActive: true }).sort({ name: 1 });
-        res.json(brands);
+
+        // Get product count for each brand
+        const brandsWithCount = await Promise.all(
+            brands.map(async (brand) => {
+                const productCount = await Product.countDocuments({
+                    $or: [
+                        { brand: brand.name },
+                        { brand: brand._id.toString() }
+                    ],
+                    isActive: true
+                });
+                return {
+                    ...brand.toObject(),
+                    productCount
+                };
+            })
+        );
+
+        res.json(brandsWithCount);
     } catch (error) {
         console.error('Get brands error:', error);
         res.status(500).json({ error: 'Error fetching brands' });
@@ -78,35 +97,21 @@ const updateBrand = async (req, res) => {
         const { id } = req.params;
         const { name, slug, description, logo, website, isActive } = req.body;
 
-        const brand = await Brand.findById(id);
+        const updateData = {}
+        if (name !== undefined) updateData.name = name
+        if (slug !== undefined) updateData.slug = slug
+        if (description !== undefined) updateData.description = description
+        if (logo !== undefined) updateData.logo = logo
+        if (website !== undefined) updateData.website = website
+        if (isActive !== undefined) updateData.isActive = isActive
+        updateData.updatedAt = Date.now()
+
+        const brand = await Brand.findByIdAndUpdate(id, updateData, { new: true });
+
         if (!brand) {
             return res.status(404).json({ error: 'Brand not found' });
         }
 
-        // Check for duplicates
-        if (name && name !== brand.name) {
-            const nameExists = await Brand.findOne({ name });
-            if (nameExists) {
-                return res.status(400).json({ error: 'Brand with this name already exists' });
-            }
-        }
-
-        if (slug && slug !== brand.slug) {
-            const slugExists = await Brand.findOne({ slug });
-            if (slugExists) {
-                return res.status(400).json({ error: 'Brand with this slug already exists' });
-            }
-        }
-
-        brand.name = name || brand.name;
-        brand.slug = slug || brand.slug;
-        brand.description = description !== undefined ? description : brand.description;
-        brand.logo = logo !== undefined ? logo : brand.logo;
-        brand.website = website !== undefined ? website : brand.website;
-        if (isActive !== undefined) brand.isActive = isActive;
-        brand.updatedAt = Date.now();
-
-        await brand.save();
         res.json(brand);
     } catch (error) {
         console.error('Update brand error:', error);
@@ -119,14 +124,15 @@ const deleteBrand = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const brand = await Brand.findById(id);
+        const brand = await Brand.findByIdAndUpdate(
+            id,
+            { isActive: false, updatedAt: Date.now() },
+            { new: true }
+        );
+
         if (!brand) {
             return res.status(404).json({ error: 'Brand not found' });
         }
-
-        brand.isActive = false;
-        brand.updatedAt = Date.now();
-        await brand.save();
 
         res.json({ message: 'Brand deleted successfully' });
     } catch (error) {
