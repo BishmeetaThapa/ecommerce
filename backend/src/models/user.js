@@ -15,6 +15,26 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    phone: {
+        type: String,
+        default: ''
+    },
+    avatar: {
+        type: String,
+        default: ''
+    },
+    bio: {
+        type: String,
+        default: ''
+    },
+    darkMode: {
+        type: Boolean,
+        default: false
+    },
+    notifications: {
+        type: Boolean,
+        default: true
+    },
     role: {
         type: String,
         enum: ['admin', 'customer'],
