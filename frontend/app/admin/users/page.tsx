@@ -208,7 +208,7 @@ export default function UsersPage() {
               ))
             ) : filtered.length ? (
               filtered.map((u) => (
-                <TableRow key={u.id} className="hover:bg-gray-50/50 transition-colors border-b last:border-0 border-gray-50">
+                <TableRow key={u._id || u.id} className="hover:bg-gray-50/50 transition-colors border-b last:border-0 border-gray-50">
                   <TableCell className="py-5 px-6">
                     <div className="flex gap-4 items-center">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-50 to-rose-100 flex items-center justify-center text-pink-500 border border-white shadow-sm">
