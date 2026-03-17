@@ -21,6 +21,10 @@ const categorySchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    productCount: {
+        type: Number,
+        default: 0
+    },
     isActive: {
         type: Boolean,
         default: true
@@ -33,11 +37,6 @@ const categorySchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
-
-categorySchema.pre('save', function (next) {
-    this.updatedAt = Date.now();
-    next();
 });
 
 module.exports = mongoose.model('Category', categorySchema);
