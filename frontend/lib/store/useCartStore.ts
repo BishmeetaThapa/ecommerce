@@ -25,12 +25,13 @@ export const useCartStore = create<CartStore>()(
             items: [],
             addItem: (product) => {
                 const currentItems = get().items
-                const existingItem = currentItems.find((item) => item.id === product.id)
+                const productId = product.id || product._id
+                const existingItem = currentItems.find((item) => item.id === productId)
 
                 if (existingItem) {
                     set({
                         items: currentItems.map((item) =>
-                            item.id === product.id
+                            item.id === productId
                                 ? { ...item, quantity: item.quantity + 1 }
                                 : item
                         ),
@@ -40,7 +41,7 @@ export const useCartStore = create<CartStore>()(
                         items: [
                             ...currentItems,
                             {
-                                id: product.id,
+                                id: productId,
                                 name: product.name,
                                 price: parseFloat(product.price) || 0,
                                 image_link: product.image_link,
@@ -52,13 +53,13 @@ export const useCartStore = create<CartStore>()(
             },
             removeItem: (productId) => {
                 set({
-                    items: get().items.filter((item) => item.id !== productId),
+                    items: get().items.filter((item) => String(item.id) !== String(productId)),
                 })
             },
             updateQuantity: (productId, quantity) => {
                 set({
                     items: get().items.map((item) =>
-                        item.id === productId ? { ...item, quantity: Math.max(0, quantity) } : item
+                        String(item.id) === String(productId) ? { ...item, quantity: Math.max(0, quantity) } : item
                     ).filter(item => item.quantity > 0),
                 })
             },
