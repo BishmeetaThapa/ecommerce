@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import authUtils from "@/lib/auth"
 
 /* Username Regex */
 const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
@@ -60,8 +61,7 @@ export default function EverGlowRegister() {
       )
 
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("user", JSON.stringify(response.data.user))
+        authUtils.setAuth(response.data.user, response.data.token)
         toast.success("Account created successfully!")
 
         // Redirect to home page after registration

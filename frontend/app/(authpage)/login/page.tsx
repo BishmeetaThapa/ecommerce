@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import authUtils from "@/lib/auth"
 
 /* Username Regex (simple & safe) */
 const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
@@ -57,14 +58,13 @@ export default function EverGlowLogin() {
         }
       )
 
-      // Store token and user data
+      // Store token and user data using auth utility
+      // Note: For production, consider httpOnly cookies to prevent XSS
       if (response.data.token) {
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("user", JSON.stringify(response.data.user))
+        authUtils.setAuth(response.data.user, response.data.token)
 
         // Redirect based on user role
-        const userRole = response.data.user.role
-        if (userRole === 'admin' || userRole === 'ADMIN') {
+        if (authUtils.isAdmin()) {
           router.push("/admin")
         } else {
           router.push("/")
