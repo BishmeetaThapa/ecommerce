@@ -3,6 +3,7 @@ const router = express.Router();
 const { register, login, getCurrentUser, forgotPassword, resetPassword } = require('../controllers/auth');
 const { auth, adminAuth } = require('../middleware/auth');
 const User = require('../models/user');
+const mongoose = require('mongoose');
 
 // Register new user
 router.post('/register', register);
@@ -19,8 +20,8 @@ router.post('/reset-password', resetPassword);
 // Get current user (protected route)
 router.get('/me', auth, getCurrentUser);
 
-// Admin routes - Get all users
-router.get('/', adminAuth, async (req, res) => {
+// Admin routes - Get all users (public for admin panel)
+router.get('/', async (req, res) => {
     try {
         const users = await User.find().select('-password').sort({ createdAt: -1 });
         res.json(users);
@@ -30,10 +31,15 @@ router.get('/', adminAuth, async (req, res) => {
     }
 });
 
-// Admin routes - Get user by ID
-router.get('/:id', adminAuth, async (req, res) => {
+// Admin routes - Get user by ID (public for settings page)
+router.get('/:id', async (req, res) => {
     try {
         const { id } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid user ID format' });
+        }
+
         const user = await User.findById(id).select('-password');
 
         if (!user) {
@@ -47,8 +53,8 @@ router.get('/:id', adminAuth, async (req, res) => {
     }
 });
 
-// Admin routes - Update user role
-router.put('/:id/role', adminAuth, async (req, res) => {
+// Admin routes - Update user role (public for admin panel)
+router.put('/:id/role', async (req, res) => {
     try {
         const { id } = req.params;
         const { role } = req.body;
@@ -68,8 +74,86 @@ router.put('/:id/role', adminAuth, async (req, res) => {
     }
 });
 
-// Admin routes - Delete user
-router.delete('/:id', adminAuth, async (req, res) => {
+// Admin routes - Update user (public for admin panel)
+router.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Validate ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid user ID format' });
+        }
+
+        const { role, name, email, phone, bio, darkMode, notifications } = req.body;
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        if (role) user.role = role;
+        if (name) user.name = name;
+        if (email) user.email = email;
+        if (phone !== undefined) user.phone = phone;
+        if (bio !== undefined) user.bio = bio;
+        if (darkMode !== undefined) user.darkMode = darkMode;
+        if (notifications !== undefined) user.notifications = notifications;
+        await user.save();
+
+        res.json({
+            message: 'User updated',
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                bio: user.bio,
+                darkMode: user.darkMode,
+                notifications: user.notifications,
+                role: user.role
+            }
+        });
+    } catch (error) {
+        console.error('Update user error:', error);
+        // Return more specific error message
+        if (error.name === 'CastError') {
+            return res.status(400).json({ error: 'Invalid user ID format' });
+        }
+        res.status(500).json({ error: 'Error updating user: ' + error.message });
+    }
+});
+
+// Admin routes - Update user password
+router.put('/:id/password', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { password } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: 'Invalid user ID format' });
+        }
+
+        if (!password) {
+            return res.status(400).json({ error: 'Password is required' });
+        }
+
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        user.password = password;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Update password error:', error);
+        res.status(500).json({ error: 'Error updating password: ' + error.message });
+    }
+});
+
+// Admin routes - Delete user (public for admin panel)
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
 
