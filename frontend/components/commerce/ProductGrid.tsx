@@ -20,8 +20,9 @@ const ProductGrid = () => {
                 // Normalize data from our backend
                 const normalizedData = response.data.map((item: any) => ({
                     ...item,
+                    id: item._id || item.id,
                     image_link: item.images?.[0]?.url || 'https://via.placeholder.com/400',
-                    brand: item.brand?.name || 'EverGlow',
+                    brand: item.brand || 'EverGlow',
                     bestSeller: Math.random() > 0.7
                 }))
                 setData(normalizedData)
@@ -82,7 +83,7 @@ const ProductGrid = () => {
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center w-full">
                 {currentProducts.map((item: any) => (
-                    <ItemCard key={item.id} product={item} />
+                    <ItemCard key={item._id || item.id} product={item} />
                 ))}
             </div>
 
