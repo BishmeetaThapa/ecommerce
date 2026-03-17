@@ -49,7 +49,7 @@ export default function EverGlowRegister() {
   const [showConfirm, setShowConfirm] = useState(false)
   const router = useRouter()
 
-  const handleRegister = async (values: { name: string; email: string; password: string }, { setSubmitting, setErrors }: { setSubmitting: (val: boolean) => void; setErrors: (errors: Record<string, string>) => void }) => {
+  const handleRegister = async (values: { name: string; email: string; password: string; role: string }, { setSubmitting, setErrors }: { setSubmitting: (val: boolean) => void; setErrors: (errors: Record<string, string>) => void }) => {
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
@@ -57,6 +57,7 @@ export default function EverGlowRegister() {
           name: values.name,
           email: values.email,
           password: values.password,
+          role: values.role,
         }
       )
 
@@ -87,6 +88,7 @@ export default function EverGlowRegister() {
       email: "",
       password: "",
       confirmPassword: "",
+      role: "customer",
     },
     validationSchema,
     onSubmit: handleRegister,
@@ -188,6 +190,20 @@ export default function EverGlowRegister() {
                   {formik.errors.confirmPassword}
                 </p>
               )}
+            </div>
+
+            {/* Role */}
+            <div className="space-y-2">
+              <Label>Account Type</Label>
+              <select
+                name="role"
+                value={formik.values.role}
+                onChange={formik.handleChange}
+                className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="customer">Customer</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
 
             <Button

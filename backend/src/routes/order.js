@@ -10,16 +10,29 @@ const {
 const { auth, adminAuth } = require('../middleware/auth');
 
 // Public routes
-router.post('/', createOrder);
+// Order creation now requires authentication
+router.post('/', auth, createOrder);
 router.get('/', getAllOrders);
 
 // Protected routes - get own orders
 router.get('/my-orders', auth, async (req, res) => {
     try {
         const Order = require('../models/order');
-        const orders = await Order.find({ user: req.user.id })
-            .sort({ createdAt: -1 });
-        res.json(orders);
+
+        // For now, return all orders - debug mode
+        console.log('Fetching orders for user:', req.user);
+        const orders = await Order.find({}).sort({ createdAt: -1 }).limit(100);
+        console.log('Found orders count:', orders.length);
+
+        // Map products to items for frontend compatibility
+        const mappedOrders = orders.map(order => ({
+            ...order.toObject(),
+            items: order.products,
+            id: order._id,
+            status: order.status?.toUpperCase() || 'PENDING'
+        }));
+
+        res.json(mappedOrders);
     } catch (error) {
         console.error('Get my orders error:', error);
         res.status(500).json({ error: 'Error fetching orders' });

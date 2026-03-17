@@ -3,7 +3,7 @@ const Product = require('../models/product');
 // Get all products
 const getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find({ isActive: true })
+    const products = await Product.find({ $or: [{ isActive: true }, { isActive: { $exists: false } }] })
       .sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
@@ -51,28 +51,49 @@ const createProduct = async (req, res) => {
   try {
     const { name, slug, description, price, stock, category, brand, images } = req.body;
 
+    console.log("Create product payload:", req.body);
+
+    // Validate required fields
+    if (!name || !slug || !description || !price || !category) {
+      return res.status(400).json({ error: 'Missing required fields: name, slug, description, price, and category are required' });
+    }
+
     // Check if product with slug already exists
-    const existingProduct = await Product.findOne({ slug });
+    const existingProduct = await Product.findOne({ slug: slug.toLowerCase() });
     if (existingProduct) {
       return res.status(400).json({ error: 'Product with this slug already exists' });
     }
 
+    // Handle images - convert string array to object array
+    let processedImages = [];
+    if (images && Array.isArray(images)) {
+      processedImages = images.map((img, index) => {
+        if (typeof img === 'string') {
+          return { url: img, isPrimary: index === 0 };
+        }
+        return img;
+      });
+    } else if (typeof images === 'string') {
+      // Single image string
+      processedImages = [{ url: images, isPrimary: true }];
+    }
+
     const product = new Product({
       name,
-      slug,
+      slug: slug.toLowerCase(),
       description,
-      price,
-      stock,
+      price: Number(price) || 0,
+      stock: Number(stock) || 0,
       category,
-      brand,
-      images: images || []
+      brand: brand || '',
+      images: processedImages
     });
 
     await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error('Create product error:', error);
-    res.status(500).json({ error: 'Error creating product' });
+    res.status(500).json({ error: 'Error creating product: ' + error.message });
   }
 };
 
@@ -109,7 +130,7 @@ const updateProduct = async (req, res) => {
 
     updateData.updatedAt = Date.now()
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true })
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { returnDocument: 'after' })
 
     if (!updatedProduct) {
       return res.status(404).json({ error: 'Product not found' })
@@ -131,7 +152,7 @@ const deleteProduct = async (req, res) => {
     const product = await Product.findByIdAndUpdate(
       id,
       { isActive: false, updatedAt: Date.now() },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!product) {

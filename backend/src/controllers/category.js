@@ -106,7 +106,7 @@ const updateCategory = async (req, res) => {
         if (isActive !== undefined) updateData.isActive = isActive
         updateData.updatedAt = Date.now()
 
-        const category = await Category.findByIdAndUpdate(id, updateData, { new: true });
+        const category = await Category.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
 
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
@@ -127,7 +127,7 @@ const deleteCategory = async (req, res) => {
         const category = await Category.findByIdAndUpdate(
             id,
             { isActive: false, updatedAt: Date.now() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!category) {

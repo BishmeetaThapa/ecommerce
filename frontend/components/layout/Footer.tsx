@@ -8,8 +8,8 @@ export default function Footer() {
     return (
         <footer
             className={`w-full mt-10 px-6 py-12 transition-colors duration-500 ${darkMode
-                    ? 'bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 text-gray-300 border-t border-gray-700'
-                    : 'bg-gradient-to-t from-pink-50 via-rose-50 to-amber-50 text-gray-700 border-t border-pink-100'
+                ? 'bg-gradient-to-t from-gray-900 via-gray-800 to-gray-900 text-gray-300 border-t border-gray-700'
+                : 'bg-gradient-to-t from-pink-50 via-rose-50 to-amber-50 text-gray-700 border-t border-pink-100'
                 }`}
         >
             {/* Top Section */}
@@ -26,7 +26,9 @@ export default function Footer() {
                     {/* Social Media Buttons */}
                     <div className="flex gap-4 mt-4">
                         <a
-                            href="#"
+                            href="https://facebook.com/everglowbeauty"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors hover:bg-pink-500 hover:text-white ${darkMode ? 'border-gray-600' : 'border-gray-300'
                                 }`}
                             aria-label="Facebook"
@@ -34,7 +36,9 @@ export default function Footer() {
                             <Facebook className="w-5 h-5" />
                         </a>
                         <a
-                            href="#"
+                            href="https://instagram.com/everglowbeauty"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors hover:bg-pink-500 hover:text-white ${darkMode ? 'border-gray-600' : 'border-gray-300'
                                 }`}
                             aria-label="Instagram"
@@ -42,7 +46,9 @@ export default function Footer() {
                             <Instagram className="w-5 h-5" />
                         </a>
                         <a
-                            href="#"
+                            href="https://twitter.com/everglowbeauty"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors hover:bg-pink-500 hover:text-white ${darkMode ? 'border-gray-600' : 'border-gray-300'
                                 }`}
                             aria-label="Twitter"
@@ -50,7 +56,9 @@ export default function Footer() {
                             <Twitter className="w-5 h-5" />
                         </a>
                         <a
-                            href="#"
+                            href="https://youtube.com/@everglowbeauty"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className={`w-10 h-10 flex items-center justify-center rounded-full border transition-colors hover:bg-pink-500 hover:text-white ${darkMode ? 'border-gray-600' : 'border-gray-300'
                                 }`}
                             aria-label="YouTube"
@@ -64,13 +72,13 @@ export default function Footer() {
                 <div className="flex flex-col sm:flex-row gap-12">
                     <div className="flex flex-col gap-3">
                         <h3 className="font-semibold text-sm uppercase tracking-wider">Shop</h3>
-                        <a href="#" className="hover:text-pink-500 transition-colors">All Products</a>
-                        <a href="#" className="hover:text-pink-500 transition-colors">New Arrivals</a>
-                        <a href="#" className="hover:text-pink-500 transition-colors">Best Sellers</a>
+                        <a href="/products" className="hover:text-pink-500 transition-colors">All Products</a>
+                        <a href="/products?filter=new" className="hover:text-pink-500 transition-colors">New Arrivals</a>
+                        <a href="/products?filter=best" className="hover:text-pink-500 transition-colors">Best Sellers</a>
                     </div>
                     <div className="flex flex-col gap-3">
                         <h3 className="font-semibold text-sm uppercase tracking-wider">Company</h3>
-                        <a href="#" className="hover:text-pink-500 transition-colors">About Us</a>
+                        <a href="/about" className="hover:text-pink-500 transition-colors">About Us</a>
                         <a href="#" className="hover:text-pink-500 transition-colors">Careers</a>
                         <a href="#" className="hover:text-pink-500 transition-colors">Contact</a>
                     </div>
@@ -93,8 +101,8 @@ export default function Footer() {
                         type="email"
                         placeholder="Your email"
                         className={`flex-1 px-4 py-2 rounded-l-full border focus:outline-none transition-colors duration-300 ${darkMode
-                                ? 'bg-gray-800 border-gray-600 text-gray-200 placeholder-gray-400 focus:ring-pink-400'
-                                : 'bg-white border-gray-300 text-gray-700 placeholder-gray-500 focus:ring-pink-500'
+                            ? 'bg-gray-800 border-gray-600 text-gray-200 placeholder-gray-400 focus:ring-pink-400'
+                            : 'bg-white border-gray-300 text-gray-700 placeholder-gray-500 focus:ring-pink-500'
                             }`}
                     />
                     <button className="bg-pink-500 hover:bg-pink-600 text-white px-6 rounded-r-full transition-colors">

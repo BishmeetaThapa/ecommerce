@@ -13,11 +13,13 @@ import { useDarkMode } from "@/components/providers/DarkModeProvider"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { useRouter } from "next/navigation"
 
 export default function CartDrawer({ children }: { children: React.ReactNode }) {
     const { items, removeItem, updateQuantity, getTotalPrice, getTotalItems } = useCartStore()
     const { darkMode } = useDarkMode()
     const [isHydrated, setIsHydrated] = useState(false)
+    const router = useRouter()
 
     useEffect(() => {
         setIsHydrated(true)
@@ -98,15 +100,18 @@ export default function CartDrawer({ children }: { children: React.ReactNode }) 
                             </div>
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-500">Shipping</span>
-                                <span className="text-green-500 font-medium">FREE</span>
+                                <span className="font-medium">Rs 150.00</span>
                             </div>
                             <Separator />
                             <div className="flex justify-between items-center text-lg font-bold">
                                 <span>Total</span>
-                                <span className="text-pink-600">Rs {getTotalPrice().toFixed(2)}</span>
+                                <span className="text-pink-600">Rs {(getTotalPrice() + 150).toFixed(2)}</span>
                             </div>
-                            <Button className="w-full bg-pink-500 hover:bg-pink-600 text-white rounded-full py-6 text-lg font-bold shadow-lg shadow-pink-200 dark:shadow-none transition-all active:scale-95">
-                                Checkout Now
+                            <Button
+                                onClick={() => router.push('/checkout')}
+                                className="w-full bg-pink-500 hover:bg-pink-600 text-white rounded-full py-6 text-lg font-bold shadow-lg shadow-pink-200 dark:shadow-none transition-all active:scale-95"
+                            >
+                                Checkout Now - Rs {(getTotalPrice() + 150).toFixed(2)}
                             </Button>
                             <p className="text-center text-[10px] text-gray-400">Secure Checkout Powered by EverGlow Pay</p>
                         </div>

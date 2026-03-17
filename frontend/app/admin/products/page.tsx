@@ -26,7 +26,7 @@ function DeleteDialog({ item, onDelete }: { item: any, onDelete: (id: string) =>
 
   const handleDelete = async () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("everglow_token")
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
       const productId = item._id || item.id
 
@@ -137,7 +137,7 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("everglow_token")
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
       const payload = {
@@ -166,7 +166,18 @@ function ProductForm({ item, close, onSave }: { item?: any, close: (o: boolean) 
       close(false)
     } catch (err: any) {
       console.error(err)
-      toast.error(err.response?.data?.error || "Action failed - check console")
+      const errorMessage = err.response?.data?.error || "Action failed - check console"
+
+      // Show more helpful error messages
+      if (errorMessage.includes('Admin only')) {
+        toast.error("Access denied. You must be an admin to perform this action.")
+      } else if (errorMessage.includes('No token')) {
+        toast.error("Please login to manage products.")
+      } else if (errorMessage.includes('Invalid token')) {
+        toast.error("Session expired. Please login again.")
+      } else {
+        toast.error(errorMessage)
+      }
     }
   }
 

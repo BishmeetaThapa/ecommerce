@@ -3,18 +3,34 @@ import { Heart, ShoppingCart, Sun, Moon, Search } from 'lucide-react'
 import { useDarkMode } from '@/components/providers/DarkModeProvider'
 import { useCartStore } from '@/lib/store/useCartStore'
 import CartDrawer from '@/components/commerce/CartDrawer'
+import WishlistDrawer from '@/components/commerce/WishlistDrawer'
 import { useEffect, useState } from 'react'
+import authUtils from '@/lib/auth'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 export default function Navbar() {
     const { darkMode, setDarkMode } = useDarkMode()
     const cartItems = useCartStore((state) => state.items)
     const [isHydrated, setIsHydrated] = useState(false)
+    const [user, setUser] = useState<any>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const router = useRouter()
 
     useEffect(() => {
         setIsHydrated(true)
+        const storedUser = authUtils.getUser()
+        setUser(storedUser)
     }, [])
 
     const totalItems = cartItems.reduce((acc, item) => acc + item.quantity, 0)
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (searchQuery.trim()) {
+            router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`)
+        }
+    }
 
     return (
         <nav className={`w-full px-6 py-4 flex items-center justify-between shadow-lg transition-colors duration-500 ${darkMode ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700'
@@ -33,7 +49,7 @@ export default function Navbar() {
             </div>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-xl mx-6">
+            <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-6">
                 <div className={`flex items-center bg-white dark:bg-gray-800 border rounded-full px-4 py-2 shadow-inner focus-within:ring-2 transition-colors duration-300 ${darkMode
                     ? 'border-gray-600 text-gray-200 placeholder-gray-400 focus:ring-pink-400'
                     : 'border-gray-300 text-gray-700 placeholder-gray-500 focus:ring-pink-500'
@@ -42,21 +58,23 @@ export default function Navbar() {
                     <input
                         type="text"
                         placeholder="Search products and brands"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-transparent outline-none placeholder:text-sm text-sm"
                     />
                 </div>
-            </div>
+            </form>
 
             {/* Action Icons */}
             <div className="flex items-center gap-5">
 
                 {/* Account */}
-                <div className="flex flex-col text-right">
+                <Link href={user ? "/profile" : "/login"} className="flex flex-col text-right hover:opacity-80 transition-opacity">
                     <span className={`text-xs font-medium transition-colors ${darkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>Hello, Sign in</span>
+                        }`}>{user ? `Hi, ${user.name}` : 'Hello, Sign in'}</span>
                     <strong className={`text-sm font-semibold transition-colors ${darkMode ? 'text-pink-300' : 'text-pink-600'
-                        }`}>Accounts & Loyalty</strong>
-                </div>
+                        }`}>{user ? 'My Account' : 'Accounts & Loyalty'}</strong>
+                </Link>
 
                 {/* Icons */}
                 <CartDrawer>
@@ -71,8 +89,12 @@ export default function Navbar() {
                     </div>
                 </CartDrawer>
 
-                <Heart className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${darkMode ? 'text-gray-300 hover:text-pink-300' : 'text-gray-700 hover:text-pink-600'
-                    }`} />
+                <WishlistDrawer>
+                    <div className="relative group">
+                        <Heart className={`w-6 h-6 cursor-pointer transition-colors duration-300 ${darkMode ? 'text-gray-300 group-hover:text-pink-300' : 'text-gray-700 group-hover:text-pink-600'
+                            }`} />
+                    </div>
+                </WishlistDrawer>
 
                 {/* Dark Mode Toggle */}
                 <button

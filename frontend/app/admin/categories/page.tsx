@@ -21,7 +21,7 @@ function DeleteDialog({ category, onDelete }: { category: any, onDelete: (id: st
 
   const handleDelete = async () => {
     try {
-      const token = localStorage.getItem("token")
+      const token = localStorage.getItem("everglow_token")
       const headers = token ? { Authorization: `Bearer ${token}` } : {}
       const categoryId = category._id || category.id
 

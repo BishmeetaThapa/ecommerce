@@ -9,6 +9,10 @@ const register = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
+        // Validate role - only allow 'admin' or 'customer'
+        const validRoles = ['admin', 'customer'];
+        const userRole = role && validRoles.includes(role) ? role : 'customer';
+
         // Check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -24,7 +28,7 @@ const register = async (req, res) => {
             name,
             email,
             password: hashedPassword,
-            role: role || 'customer'
+            role: userRole
         });
 
         await user.save();
@@ -103,6 +107,33 @@ const getCurrentUser = async (req, res) => {
     } catch (error) {
         console.error('Get user error:', error);
         res.status(500).json({ error: 'Error getting user' });
+    }
+};
+
+// Update current user profile
+const updateProfile = async (req, res) => {
+    try {
+        const { name, phone, bio, avatar } = req.body;
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Update fields if provided
+        if (name) user.name = name;
+        if (phone !== undefined) user.phone = phone;
+        if (bio !== undefined) user.bio = bio;
+        if (avatar !== undefined) user.avatar = avatar;
+
+        await user.save();
+
+        // Return user without password
+        const updatedUser = await User.findById(user._id).select('-password');
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({ error: 'Error updating profile' });
     }
 };
 
@@ -193,6 +224,7 @@ module.exports = {
     register,
     login,
     getCurrentUser,
+    updateProfile,
     forgotPassword,
     resetPassword
 };

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getCurrentUser, forgotPassword, resetPassword } = require('../controllers/auth');
+const { register, login, getCurrentUser, updateProfile, forgotPassword, resetPassword } = require('../controllers/auth');
 const { auth, adminAuth } = require('../middleware/auth');
 const User = require('../models/user');
 const mongoose = require('mongoose');
@@ -19,6 +19,9 @@ router.post('/reset-password', resetPassword);
 
 // Get current user (protected route)
 router.get('/me', auth, getCurrentUser);
+
+// Update current user profile (protected route)
+router.put('/me', auth, updateProfile);
 
 // Admin routes - Get all users (public for admin panel)
 router.get('/', async (req, res) => {

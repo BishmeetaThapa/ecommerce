@@ -19,11 +19,12 @@ const seedUsers = async () => {
 
         // Sample users to create
         const users = [
-            { name: 'John Doe', email: 'john@example.com', password: 'password123', role: 'user' },
-            { name: 'Jane Smith', email: 'jane@example.com', password: 'password123', role: 'user' },
-            { name: 'Bob Johnson', email: 'bob@example.com', password: 'password123', role: 'user' },
-            { name: 'Alice Williams', email: 'alice@example.com', password: 'password123', role: 'user' },
-            { name: 'Mike Brown', email: 'mike@example.com', password: 'password123', role: 'user' },
+            { name: 'Admin User', email: 'admin@everglow.com', password: 'admin123', role: 'admin' },
+            { name: 'John Doe', email: 'john@example.com', password: 'password123', role: 'customer' },
+            { name: 'Jane Smith', email: 'jane@example.com', password: 'password123', role: 'customer' },
+            { name: 'Bob Johnson', email: 'bob@example.com', password: 'password123', role: 'customer' },
+            { name: 'Alice Williams', email: 'alice@example.com', password: 'password123', role: 'customer' },
+            { name: 'Mike Brown', email: 'mike@example.com', password: 'password123', role: 'customer' },
         ];
 
         // Hash passwords and create users

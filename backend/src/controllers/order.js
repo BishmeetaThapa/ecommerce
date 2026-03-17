@@ -51,16 +51,21 @@ const getOrderById = async (req, res) => {
 // Create new order
 const createOrder = async (req, res) => {
     try {
-        const { user, items, totalAmount, shippingAddress, paymentMethod, status } = req.body;
+        // Get user from auth token (more secure)
+        const userId = req.user ? req.user.id : null;
+        const { items, totalAmount, shippingAddress, paymentMethod, status } = req.body;
 
         // Accept both 'items' and 'products' for compatibility
-        const products = items || req.body.products;
+        const orderItems = items || req.body.products;
 
-        // Convert user string to ObjectId if it's valid
-        let userId = null;
-        if (user && mongoose.Types.ObjectId.isValid(user)) {
-            userId = new mongoose.Types.ObjectId(user);
-        }
+        // Format products to match schema - convert productId to product field
+        const products = orderItems ? orderItems.map((item) => ({
+            product: item.productId || item.product || null,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image
+        })) : [];
 
         const order = new Order({
             user: userId,

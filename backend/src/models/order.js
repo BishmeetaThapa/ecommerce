@@ -26,7 +26,10 @@ const orderSchema = new mongoose.Schema({
         default: 'pending'
     },
     shippingAddress: {
+        name: String,
+        phone: String,
         street: String,
+        address: String,
         city: String,
         zipCode: String,
         country: String

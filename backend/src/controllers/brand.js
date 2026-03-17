@@ -106,7 +106,7 @@ const updateBrand = async (req, res) => {
         if (isActive !== undefined) updateData.isActive = isActive
         updateData.updatedAt = Date.now()
 
-        const brand = await Brand.findByIdAndUpdate(id, updateData, { new: true });
+        const brand = await Brand.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
 
         if (!brand) {
             return res.status(404).json({ error: 'Brand not found' });
@@ -127,7 +127,7 @@ const deleteBrand = async (req, res) => {
         const brand = await Brand.findByIdAndUpdate(
             id,
             { isActive: false, updatedAt: Date.now() },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!brand) {

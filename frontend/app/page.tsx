@@ -1,8 +1,8 @@
 import { DarkModeProvider } from '@/components/providers/DarkModeProvider'
 import Navbar from '@/components/layout/Navbar'
 import ProductCategories from '@/components/commerce/ProductCategories'
-import PromotionBanner from '@/components/commerce/PromotionBanner'
 import ProductGrid from '@/components/commerce/ProductGrid'
+import FlashSale from '@/components/commerce/FlashSale'
 import Footer from '@/components/layout/Footer'
 import React from 'react'
 
@@ -13,9 +13,7 @@ const Home = () => {
         <Navbar />
         <main className="flex-grow">
           <ProductCategories />
-          <div className="py-8">
-            <PromotionBanner />
-          </div>
+          <FlashSale />
           <ProductGrid />
         </main>
         <Footer />

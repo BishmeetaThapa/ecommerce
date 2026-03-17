@@ -21,7 +21,7 @@ router.get('/slug/:slug', getProductBySlug);
 
 // Admin routes (protected)
 router.post('/', adminAuth, createProduct);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
+router.put('/:id', adminAuth, updateProduct);
+router.delete('/:id', adminAuth, deleteProduct);
 
 module.exports = router;
