@@ -21,9 +21,11 @@ function DeleteDialog({ category, onDelete }: { category: any, onDelete: (id: st
 
   const handleDelete = async () => {
     try {
-      // MongoDB uses _id, old API uses id
-      const categoryId = category._id || category.id;
-      await axios.delete(`${API_BASE}/${categoryId}`)
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const categoryId = category._id || category.id
+
+      await axios.delete(`${API_BASE}/${categoryId}`, { headers })
       toast.success("Category deleted from Everglow catalog")
       onDelete(categoryId)
       setOpen(false)
@@ -65,21 +67,27 @@ function DeleteDialog({ category, onDelete }: { category: any, onDelete: (id: st
 function CategoryForm({ category, close, onSave }: { category?: any, close: (o: boolean) => void, onSave: (c: any, t: string) => void }) {
   const [form, setForm] = useState({
     name: category?.name || "",
-    slug: category?.slug || ""
+    slug: category?.slug || "",
+    description: category?.description || "",
+    productCount: category?.productCount || 0
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [e.target.id]: e.target.value })
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+
       if (category) {
-        const res = await axios.put(`${API_BASE}/${category.id}`, form)
+        const categoryId = category._id || category.id
+        const res = await axios.put(`${API_BASE}/${categoryId}`, form, { headers })
         onSave(res.data, "edit")
         toast.success("Category updated successfully")
       } else {
-        const res = await axios.post(API_BASE, form)
+        const res = await axios.post(API_BASE, form, { headers })
         onSave(res.data, "add")
         toast.success("Category added to catalog")
       }
@@ -99,6 +107,16 @@ function CategoryForm({ category, close, onSave }: { category?: any, close: (o: 
       <div className="grid gap-1">
         <Label htmlFor="slug">URL Slug</Label>
         <Input id="slug" value={form.slug} onChange={handleChange} placeholder="e.g. skincare" required />
+      </div>
+      <div className="grid gap-1">
+        <Label htmlFor="productCount">Product Count</Label>
+        <Input
+          id="productCount"
+          type="number"
+          value={form.productCount}
+          onChange={handleChange}
+          placeholder="0"
+        />
       </div>
 
       <Button className="rounded-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-6">
@@ -166,15 +184,16 @@ const CategoriesPage = () => {
   )
 
   const handleSaveUI = (cat: any, type: string) => {
+    const catId = cat._id || cat.id
     if (type === "add") setCategories((prev) => [cat, ...prev])
     else
       setCategories((prev) =>
-        prev.map((i) => (i.id === cat.id ? cat : i))
+        prev.map((i) => ((i._id || i.id) === catId ? cat : i))
       )
   }
 
   const handleDeleteUI = (id: string) =>
-    setCategories((prev) => prev.filter((c) => c.id !== id))
+    setCategories((prev) => prev.filter((c) => (c._id || c.id) !== id))
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 bg-gray-50/50 min-h-screen">
@@ -211,13 +230,13 @@ const CategoriesPage = () => {
             <div key={i} className="h-40 bg-gray-100 animate-pulse rounded-[2rem]"></div>
           ))
         ) : filtered.map((c) => (
-          <div key={c.id} className="group bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex flex-col items-center gap-4 transition-all hover:shadow-xl hover:shadow-pink-100/50">
+          <div key={c._id || c.id} className="group bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 flex flex-col items-center gap-4 transition-all hover:shadow-xl hover:shadow-pink-100/50">
             <div className="w-20 h-20 bg-pink-50 text-pink-500 rounded-full flex items-center justify-center font-black text-2xl uppercase border-4 border-white shadow-inner">
               {c.name.charAt(0)}
             </div>
             <div className="text-center">
               <h3 className="font-bold text-gray-900 text-lg leading-tight">{c.name}</h3>
-              <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">{c._count?.products || 0} Products</span>
+              <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">{c.productCount || 0} Products</span>
             </div>
             <div className="flex gap-1 mt-2 p-1 bg-gray-50 rounded-full">
               <CategoryDialog category={c} onSave={handleSaveUI} />
