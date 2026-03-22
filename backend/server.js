@@ -10,6 +10,7 @@ const productRoutes = require('./src/routes/product');
 const orderRoutes = require('./src/routes/order');
 const categoryRoutes = require('./src/routes/category');
 const brandRoutes = require('./src/routes/brand');
+const reviewRoutes = require('./src/routes/review');
 const connectDB = require('./src/db/connect');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes); // User management routes (admin)
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/brands', brandRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/orders', orderRoutes);
 
 // MongoDB Connection

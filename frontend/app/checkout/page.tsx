@@ -84,7 +84,7 @@ export default function CheckoutPage() {
             const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
             const orderData = {
-                user: currentUser._id,
+                user: currentUser.id,
                 items: items.map(item => ({
                     productId: item.id,
                     name: item.name,

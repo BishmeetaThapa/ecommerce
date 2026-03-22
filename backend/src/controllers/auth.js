@@ -103,7 +103,20 @@ const getCurrentUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
-        res.json(user);
+        // Return with 'id' instead of '_id' for consistency
+        res.json({
+            _id: user._id,
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            bio: user.bio,
+            avatar: user.avatar,
+            role: user.role,
+            darkMode: user.darkMode,
+            notifications: user.notifications,
+            createdAt: user.createdAt
+        });
     } catch (error) {
         console.error('Get user error:', error);
         res.status(500).json({ error: 'Error getting user' });

@@ -18,10 +18,24 @@ router.get('/', getAllOrders);
 router.get('/my-orders', auth, async (req, res) => {
     try {
         const Order = require('../models/order');
+        const mongoose = require('mongoose');
 
-        // For now, return all orders - debug mode
-        console.log('Fetching orders for user:', req.user);
-        const orders = await Order.find({}).sort({ createdAt: -1 }).limit(100);
+        // Get user ID from the authenticated user
+        let userId = req.user.id;
+        console.log('Fetching orders for user:', userId, 'type:', typeof userId);
+
+        // Convert to MongoDB ObjectId if needed
+        let queryUserId = userId;
+        if (userId && typeof userId === 'string') {
+            try {
+                queryUserId = new mongoose.Types.ObjectId(userId);
+            } catch (e) {
+                console.log('Could not convert to ObjectId');
+            }
+        }
+
+        // Filter orders by user ID
+        const orders = await Order.find({ user: queryUserId }).sort({ createdAt: -1 });
         console.log('Found orders count:', orders.length);
 
         // Map products to items for frontend compatibility

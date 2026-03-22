@@ -53,6 +53,8 @@ const createOrder = async (req, res) => {
     try {
         // Get user from auth token (more secure)
         const userId = req.user ? req.user.id : null;
+        console.log('Creating order for user:', userId);
+
         const { items, totalAmount, shippingAddress, paymentMethod, status } = req.body;
 
         // Accept both 'items' and 'products' for compatibility
@@ -77,6 +79,7 @@ const createOrder = async (req, res) => {
         });
 
         await order.save();
+        console.log('Order saved with ID:', order._id, 'User:', order.user);
 
         // Return with mapped items field
         res.status(201).json({
