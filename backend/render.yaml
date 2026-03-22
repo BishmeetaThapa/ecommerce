@@ -1,0 +1,32 @@
+services:
+  # Backend API Service
+  - type: web
+    name: everglow-backend
+    env: node
+    region: oregon
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false # Set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false # Set this in Render dashboard
+      - key: FRONTEND_URL
+        value: https://your-frontend.onrender.com
+      - key: EMAIL_HOST
+        sync: false
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: EMAIL_FROM
+        value: "\"EverGlow Beauty\" <noreply@everglow.com>"
+    autoDeploy: true
+    repoUrl: https://github.com/BishmeetaThapa/ecommerce
+    branch: main
