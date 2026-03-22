@@ -1,8 +1,9 @@
 import { DarkModeProvider } from '@/components/providers/DarkModeProvider'
 import Navbar from '@/components/layout/Navbar'
 import ProductCategories from '@/components/commerce/ProductCategories'
-import ProductGrid from '@/components/commerce/ProductGrid'
 import FlashSale from '@/components/commerce/FlashSale'
+import HomeProductShowcase from '@/components/commerce/HomeProductShowcase'
+import ProductGrid from '@/components/commerce/ProductGrid'
 import Footer from '@/components/layout/Footer'
 import React from 'react'
 
@@ -11,10 +12,11 @@ const Home = () => {
     <DarkModeProvider>
       <div className="flex flex-col min-h-screen">
         <Navbar />
-        <main className="flex-grow">
+        <main className="flex-grow pt-20">
           <ProductCategories />
           <FlashSale />
-          <ProductGrid />
+          <ProductGrid limit={12} />
+          <HomeProductShowcase />
         </main>
         <Footer />
       </div>

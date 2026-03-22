@@ -27,10 +27,17 @@ interface UserProfile {
 
 interface Order {
     _id: string
+    id?: string
     totalAmount: number
     status: string
     paymentMethod: string
     createdAt: string
+    items?: Array<{
+        name: string
+        price: number
+        quantity: number
+        image: string
+    }>
     products: Array<{
         name: string
         price: number
@@ -54,6 +61,7 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [isEditing, setIsEditing] = useState(false)
+    const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
     const [activeTab, setActiveTab] = useState<OrderTab>('to_receive')
     const [formData, setFormData] = useState({
         name: '',
@@ -148,13 +156,33 @@ export default function ProfilePage() {
         })
     }
 
+    const handleUpdateOrderStatus = async (orderId: string, status: string) => {
+        setUpdatingOrderId(orderId)
+        try {
+            const token = authUtils.getToken()
+            await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/orders/${orderId}`,
+                { status },
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+            // Update local state smoothly
+            setOrders(prev => prev.map(o => (o._id === orderId || o.id === orderId) ? { ...o, status } : o))
+            toast.success(`Order successfully marked as ${status.replace('_', ' ')}`)
+        } catch (error: any) {
+            console.error('Update order error:', error)
+            toast.error(error.response?.data?.error || 'Failed to update order status')
+        } finally {
+            setUpdatingOrderId(null)
+        }
+    }
+
     // Filter orders by status
-    const toPayOrders = orders.filter(o => o.status === 'pending')
-    const toShipOrders = orders.filter(o => o.status === 'processing')
-    const toReceiveOrders = orders.filter(o => o.status === 'shipped')
-    const deliveredOrders = orders.filter(o => o.status === 'delivered')
-    const returnOrders = orders.filter(o => o.status === 'return_requested' || o.status === 'returned')
-    const cancelledOrders = orders.filter(o => o.status === 'cancelled')
+    const toPayOrders = orders.filter(o => o.status?.toLowerCase() === 'pending')
+    const toShipOrders = orders.filter(o => o.status?.toLowerCase() === 'processing')
+    const toReceiveOrders = orders.filter(o => o.status?.toLowerCase() === 'shipped')
+    const deliveredOrders = orders.filter(o => o.status?.toLowerCase() === 'delivered')
+    const returnOrders = orders.filter(o => o.status?.toLowerCase() === 'return_requested' || o.status?.toLowerCase() === 'returned')
+    const cancelledOrders = orders.filter(o => o.status?.toLowerCase() === 'cancelled')
 
     const getOrdersByTab = (tab: OrderTab): Order[] => {
         switch (tab) {
@@ -169,7 +197,7 @@ export default function ProfilePage() {
     }
 
     const getStatusColor = (status: string) => {
-        switch (status) {
+        switch (status?.toLowerCase()) {
             case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200'
             case 'processing': return 'bg-blue-100 text-blue-700 border-blue-200'
             case 'shipped': return 'bg-purple-100 text-purple-700 border-purple-200'
@@ -182,7 +210,7 @@ export default function ProfilePage() {
     }
 
     const getStatusLabel = (status: string) => {
-        switch (status) {
+        switch (status?.toLowerCase()) {
             case 'pending': return 'To Pay'
             case 'processing': return 'To Ship'
             case 'shipped': return 'To Receive'
@@ -498,6 +526,44 @@ export default function ProfilePage() {
                                                                 <span className="font-bold text-lg text-pink-500">Rs {order.totalAmount}</span>
                                                             </div>
                                                         </div>
+
+                                                        {/* Action Buttons */}
+                                                        {['pending', 'processing'].includes(order.status?.toLowerCase() || '') && (
+                                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                                                                <Button 
+                                                                    variant="destructive" 
+                                                                    size="sm"
+                                                                    disabled={updatingOrderId === (order._id || order.id)}
+                                                                    onClick={() => handleUpdateOrderStatus((order._id || order.id) as string, 'cancelled')}
+                                                                >
+                                                                    {updatingOrderId === (order._id || order.id) ? 'Processing...' : 'Cancel Order'}
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        {order.status?.toLowerCase() === 'shipped' && (
+                                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                                                                <Button 
+                                                                    className="bg-green-500 hover:bg-green-600 text-white" 
+                                                                    size="sm"
+                                                                    disabled={updatingOrderId === (order._id || order.id)}
+                                                                    onClick={() => handleUpdateOrderStatus((order._id || order.id) as string, 'delivered')}
+                                                                >
+                                                                    {updatingOrderId === (order._id || order.id) ? 'Processing...' : 'Mark as Received'}
+                                                                </Button>
+                                                            </div>
+                                                        )}
+                                                        {order.status?.toLowerCase() === 'delivered' && (
+                                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+                                                                <Button 
+                                                                    variant="outline" 
+                                                                    size="sm"
+                                                                    disabled={updatingOrderId === (order._id || order.id)}
+                                                                    onClick={() => handleUpdateOrderStatus((order._id || order.id) as string, 'return_requested')}
+                                                                >
+                                                                    {updatingOrderId === (order._id || order.id) ? 'Processing...' : 'Request Return'}
+                                                                </Button>
+                                                            </div>
+                                                        )}
 
                                                         {/* Shipping Address */}
                                                         {order.shippingAddress && (

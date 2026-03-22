@@ -33,11 +33,12 @@ interface ProductGridProps {
     category?: string
     filter?: string
     isSale?: boolean
+    limit?: number
 }
 
 type SortOption = 'default' | 'price-low' | 'price-high' | 'name-a' | 'name-z'
 
-const ProductGrid = ({ searchQuery = '', category = '', filter = '', isSale = false }: ProductGridProps) => {
+const ProductGrid = ({ searchQuery = '', category = '', filter = '', isSale = false, limit }: ProductGridProps) => {
     const [data, setData] = useState<Product[]>([])
     const [brands, setBrands] = useState<Brand[]>([])
     const [loading, setLoading] = useState(true)
@@ -160,27 +161,13 @@ const ProductGrid = ({ searchQuery = '', category = '', filter = '', isSale = fa
         </div>
     )
 
-    const totalPages = Math.ceil(sortedProducts.length / productsPerPage)
-
-    let startPage = Math.max(currentPage - Math.floor(maxPageButtons / 2), 1)
-    let endPage = startPage + maxPageButtons - 1
-    if (endPage > totalPages) {
-        endPage = totalPages
-        startPage = Math.max(endPage - maxPageButtons + 1, 1)
-    }
-    const visiblePages = []
-    for (let i = startPage; i <= endPage; i++) {
-        visiblePages.push(i)
-    }
-
-    const indexOfLastProduct = currentPage * productsPerPage
-    const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-    const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+    // Show all or slice by limit 
+    const currentProducts = limit ? sortedProducts.slice(0, limit) : sortedProducts
 
     return (
-        <div className="flex flex-col w-full max-w-7xl mx-auto">
+        <div className="flex flex-col w-full">
             {/* Professional Header */}
-            <div className="py-8 px-4 md:px-8">
+            <div className="py-8">
                 <div className="text-center mb-8">
                     {isSale ? (
                         <div>
@@ -365,62 +352,14 @@ const ProductGrid = ({ searchQuery = '', category = '', filter = '', isSale = fa
             </div>
 
             {/* Product Grid */}
-            <div className="px-4 md:px-8 pb-12">
+            <div className="pb-12">
                 {currentProducts.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 md:gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                             {currentProducts.map((item) => (
                                 <ItemCard key={item._id || item.id} product={item} />
                             ))}
                         </div>
-
-                        {/* Pagination */}
-                        {totalPages > 1 && (
-                            <div className="flex flex-col items-center gap-4 mt-12">
-                                <p className="text-sm text-gray-500">
-                                    Showing {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, sortedProducts.length)} of {sortedProducts.length} products
-                                </p>
-                                <div className="flex items-center gap-2 flex-wrap justify-center">
-                                    <button
-                                        onClick={() => {
-                                            setCurrentPage(prev => Math.max(prev - 1, 1))
-                                            window.scrollTo({ top: 0, behavior: 'smooth' })
-                                        }}
-                                        className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-pink-500 hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-current"
-                                        disabled={currentPage === 1}
-                                    >
-                                        Previous
-                                    </button>
-
-                                    {visiblePages.map(page => (
-                                        <button
-                                            key={page}
-                                            onClick={() => {
-                                                setCurrentPage(page)
-                                                window.scrollTo({ top: 0, behavior: 'smooth' })
-                                            }}
-                                            className={`w-10 h-10 rounded-full border transition flex items-center justify-center font-bold ${currentPage === page
-                                                ? 'bg-pink-500 text-white border-pink-500 shadow-lg shadow-pink-300'
-                                                : 'border-gray-200 dark:border-gray-700 hover:bg-pink-50 dark:hover:bg-gray-800'
-                                                }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    ))}
-
-                                    <button
-                                        onClick={() => {
-                                            setCurrentPage(prev => Math.min(prev + 1, totalPages))
-                                            window.scrollTo({ top: 0, behavior: 'smooth' })
-                                        }}
-                                        className="px-4 py-2 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-pink-500 hover:text-white transition disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-current"
-                                        disabled={currentPage === totalPages}
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                     </>
                 ) : (
                     <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/50 rounded-2xl">

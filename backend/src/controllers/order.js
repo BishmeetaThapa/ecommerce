@@ -75,7 +75,9 @@ const createOrder = async (req, res) => {
             totalAmount: Number(totalAmount) || 0,
             shippingAddress,
             paymentMethod: paymentMethod || 'cash on delivery',
-            status: (status || 'pending').toLowerCase()
+            status: (status || 'pending').toLowerCase(),
+            isPaid: paymentMethod && paymentMethod !== 'cod' && paymentMethod !== 'cash on delivery' ? true : false,
+            paidAt: paymentMethod && paymentMethod !== 'cod' && paymentMethod !== 'cash on delivery' ? Date.now() : undefined
         });
 
         await order.save();

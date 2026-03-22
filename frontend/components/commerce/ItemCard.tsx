@@ -74,7 +74,7 @@ const ItemCard = ({ product }: ItemCardProps) => {
 
     return (
         <>
-            <div className={`group relative w-full p-3 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${darkMode ? 'bg-gray-800' : 'bg-white shadow-lg shadow-gray-100'}`}>
+            <div className={`group relative w-full p-4 transition-all duration-300 hover:shadow-xl hover:z-10 border border-gray-100 dark:border-gray-800 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
                 {/* Badge & Wishlist */}
                 <div className="flex justify-between items-start mb-3">
                     <div className="flex gap-2">

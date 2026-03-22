@@ -33,7 +33,7 @@ export default function Navbar() {
     }
 
     return (
-        <nav className={`w-full px-6 py-4 flex items-center justify-between shadow-lg transition-colors duration-500 ${darkMode ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700'
+        <nav className={`sticky top-0 z-50 w-full px-6 py-4 flex items-center justify-between shadow-lg transition-colors duration-500 ${darkMode ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700'
             : 'bg-gradient-to-r from-pink-50 via-rose-50 to-amber-50 border-b border-pink-100'
             }`}>
 

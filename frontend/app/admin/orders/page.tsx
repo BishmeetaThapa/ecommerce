@@ -455,6 +455,8 @@ export default function OrdersPage() {
                       <option value="shipped">Shipped</option>
                       <option value="delivered">Delivered</option>
                       <option value="cancelled">Cancelled</option>
+                      <option value="return_requested">Return Requested</option>
+                      <option value="returned">Returned</option>
                     </select>
                   </div>
 
@@ -599,6 +601,8 @@ export default function OrdersPage() {
                       <option value="SHIPPED">SHIPPED</option>
                       <option value="DELIVERED">DELIVERED</option>
                       <option value="CANCELLED">CANCELLED</option>
+                      <option value="RETURN_REQUESTED">RETURN REQUESTED</option>
+                      <option value="RETURNED">RETURNED</option>
                     </select>
                   </TableCell>
 

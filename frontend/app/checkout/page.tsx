@@ -102,7 +102,7 @@ export default function CheckoutPage() {
                 totalAmount: getTotalPrice() + SHIPPING_FEE,
                 shippingFee: SHIPPING_FEE,
                 paymentMethod: paymentMethod,
-                status: 'pending'
+                status: paymentMethod === 'cod' ? 'pending' : 'processing'
             }
 
             const response = await axios.post(
@@ -172,7 +172,7 @@ export default function CheckoutPage() {
                                     Continue Shopping
                                 </Button>
                                 <Button
-                                    onClick={() => router.push('/admin/orders')}
+                                    onClick={() => router.push('/profile')}
                                     variant="outline"
                                     className="w-full rounded-full"
                                 >

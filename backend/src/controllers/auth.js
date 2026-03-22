@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const { JWT_SECRET } = require('../middleware/auth');
+const { sendPasswordResetEmail, sendWelcomeEmail } = require('../utils/email');
 
 // Register new user
 const register = async (req, res) => {
@@ -32,6 +33,9 @@ const register = async (req, res) => {
         });
 
         await user.save();
+
+        // Send welcome email (async - don't wait for it)
+        sendWelcomeEmail(email, name).catch(err => console.error('Welcome email error:', err));
 
         // Generate token
         const token = jwt.sign(
@@ -173,20 +177,23 @@ const forgotPassword = async (req, res) => {
         const resetToken = user.generateResetPasswordToken();
         await user.save();
 
-        // In production, you would send an email with the reset link
-        // For development, include token in response for testing
-        if (process.env.NODE_ENV !== 'production') {
-            res.json({
-                message: 'If an account exists with this email, a password reset link has been sent.',
-                // Development only - remove in production
-                resetToken: resetToken,
-                resetLink: 'http://localhost:3000/reset-password?token=' + resetToken
-            });
-        } else {
-            res.json({
-                message: 'If an account exists with this email, a password reset link has been sent.'
-            });
+        // Send password reset email
+        const emailResult = await sendPasswordResetEmail(email, resetToken, user.name);
+
+        // Always return success to prevent email enumeration
+        // In development mode, include token for testing
+        const response = {
+            message: 'If an account exists with this email, a password reset link has been sent.'
+        };
+
+        // Include reset link in development only
+        if (process.env.NODE_ENV !== 'production' && emailResult.devMode) {
+            response.resetToken = resetToken;
+            response.resetLink = 'http://localhost:3000/reset-password?token=' + resetToken;
+            response.devMode = true;
         }
+
+        res.json(response);
     } catch (error) {
         console.error('Forgot password error:', error);
         res.status(500).json({ error: 'Error processing forgot password request' });
