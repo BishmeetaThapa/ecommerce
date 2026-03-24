@@ -4,42 +4,6 @@ A full-stack e-commerce application with a Next.js frontend and Express.js backe
 
 ---
 
-## 📸 Screenshots
-
-### Home Page
-![Home Page](frontend/public/home.png)
-_Main landing page with featured products and promotions_
-
-### Product Listing
-![Products](frontend/public/products.png)
-_Product catalog with grid view_
-
-### Product Detail - Add to Cart
-![Product Detail](frontend/public/productview.png)
-_Product detail page showing Add to Cart button_
-
-### Admin Dashboard - Add Product
-![Admin Dashboard](frontend/public/admin.png)
-_Admin panel with Add Product functionality_
-
-### User Account
-![User Account](frontend/public/user.png)
-_User account and profile page_
-
-### Admin Dashboard Overview
-![Admin Dashboard Overview](frontend/public/admin-overview.png)
-_Admin dashboard with overview and charts_
-
-### Admin - Payment Processing
-![Payment](frontend/public/paying.png)
-_Payment processing in admin dashboard_
-
-### Overview
-![Overview](frontend/public/overview.png)
-_Platform overview_
-
----
-
 ## 🏗️ Project Architecture
 
 ```
@@ -387,6 +351,42 @@ Open `http://localhost:3000` in your browser.
 | `/admin/settings` | Settings |
 
 ---
+
+---
+
+## 📸 Screenshots
+
+### Home Page
+![Home Page](frontend/public/home.png)
+_Main landing page with featured products and promotions_
+
+### Product Listing
+![Products](frontend/public/products.png)
+_Product catalog with grid view_
+
+### Product Detail - Add to Cart
+![Product Detail](frontend/public/productview.png)
+_Product detail page showing Add to Cart button_
+
+### Admin Dashboard - Add Product
+![Admin Dashboard](frontend/public/admin.png)
+_Admin panel with Add Product functionality_
+
+### User Account
+![User Account](frontend/public/user.png)
+_User account and profile page_
+
+### Admin Dashboard Overview
+![Admin Dashboard Overview](frontend/public/admin-overview.png)
+_Admin dashboard with overview and charts_
+
+### Admin - Payment Processing
+![Payment](frontend/public/paying.png)
+_Payment processing in admin dashboard_
+
+### Overview
+![Overview](frontend/public/overview.png)
+_Platform overview_
 
 ---
 
