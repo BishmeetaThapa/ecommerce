@@ -19,7 +19,7 @@ _Product catalog with grid view_
 _Product detail page showing Add to Cart button_
 
 ### Admin Dashboard - Add Product
-![Admin Dashboard](frontend/public/Screenshot%202026-03-24%20101148.png)
+![Admin Dashboard](frontend/public/Screenshot%202026-03-24%20175229.png)
 _Admin panel with Add Product functionality_
 
 ---
