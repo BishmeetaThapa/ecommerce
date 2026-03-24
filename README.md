@@ -4,6 +4,22 @@ A full-stack e-commerce application with a Next.js frontend and Express.js backe
 
 ---
 
+## 📸 Screenshots
+
+### Home Page
+![Home Page](frontend/public/Screenshot%202026-03-24%20175109.png)
+
+### Product Listing
+![Products](frontend/public/Screenshot%202026-03-24%20175131.png)
+
+### Product Detail
+![Product Detail](frontend/public/Screenshot%202026-03-24%20175148.png)
+
+### Admin Dashboard
+![Admin Dashboard](frontend/public/Screenshot%202026-03-24%20101148.png)
+
+---
+
 ## 🏗️ Project Architecture
 
 ```
