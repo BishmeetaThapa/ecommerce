@@ -8,15 +8,19 @@ A full-stack e-commerce application with a Next.js frontend and Express.js backe
 
 ### Home Page
 ![Home Page](frontend/public/Screenshot%202026-03-24%20175109.png)
+_Main landing page with featured products and promotions_
 
 ### Product Listing
 ![Products](frontend/public/Screenshot%202026-03-24%20175131.png)
+_Product catalog with grid view_
 
-### Product Detail
+### Product Detail - Add to Cart
 ![Product Detail](frontend/public/Screenshot%202026-03-24%20175148.png)
+_Product detail page showing Add to Cart button_
 
-### Admin Dashboard
+### Admin Dashboard - Add Product
 ![Admin Dashboard](frontend/public/Screenshot%202026-03-24%20101148.png)
+_Admin panel with Add Product functionality_
 
 ---
 
