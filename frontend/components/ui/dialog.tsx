@@ -65,6 +65,9 @@ function DialogContent({
         )}
         {...props}
       >
+        <VisuallyHidden>
+          <DialogTitle />
+        </VisuallyHidden>
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close
@@ -77,6 +80,21 @@ function DialogContent({
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
+  )
+}
+
+function VisuallyHidden({
+  children,
+  ...props
+}: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="visually-hidden"
+      className="absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0 clip-[rect(0,0,0,0)]"
+      {...props}
+    >
+      {children}
+    </span>
   )
 }
 
@@ -140,4 +158,5 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+  VisuallyHidden,
 }

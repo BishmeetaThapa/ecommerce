@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -9,8 +9,15 @@ import authUtils from "@/lib/auth"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted) return
+
     // Check if user is authenticated
     const token = authUtils.getToken()
     const user = authUtils.getUser()
@@ -25,13 +32,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push('/login')
       return
     }
-  }, [router])
+  }, [router, isMounted])
 
-  const token = authUtils.getToken()
-  const user = authUtils.getUser()
+  const token = isMounted ? authUtils.getToken() : null
+  const user = isMounted ? authUtils.getUser() : null
 
   // Show loading while checking auth
-  if (!token || !user || user.role?.toLowerCase() !== 'admin') {
+  if (!isMounted || !token || !user || user.role?.toLowerCase() !== 'admin') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

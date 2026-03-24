@@ -30,6 +30,10 @@ _User account and profile page_
 ![Admin Dashboard Overview](frontend/public/Screenshot%202026-03-24%20175547.png)
 _Admin dashboard with overview and charts_
 
+### Admin - Payment Processing
+![Payment](frontend/public/paying.png)
+_Payment processing in admin dashboard_
+
 ---
 
 ## 🏗️ Project Architecture
