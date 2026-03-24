@@ -22,6 +22,14 @@ _Product detail page showing Add to Cart button_
 ![Admin Dashboard](frontend/public/Screenshot%202026-03-24%20175229.png)
 _Admin panel with Add Product functionality_
 
+### User Account
+![User Account](frontend/public/Screenshot%202026-03-24%20175258.png)
+_User account and profile page_
+
+### Admin Dashboard Overview
+![Admin Dashboard Overview](frontend/public/Screenshot%202026-03-24%20175547.png)
+_Admin dashboard with overview and charts_
+
 ---
 
 ## 🏗️ Project Architecture
