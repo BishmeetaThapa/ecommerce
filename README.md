@@ -390,13 +390,6 @@ _Platform overview_
 
 ---
 
-## 📚 Documentation
-
-- [Backend README](backend/README.md) - Detailed backend documentation
-- [Email Setup Guide](backend/EMAIL_SETUP.md) - How to configure email (Nodemailer)
-
----
-
 ## 📄 License
 
 This project is open source and available for learning and development purposes.
